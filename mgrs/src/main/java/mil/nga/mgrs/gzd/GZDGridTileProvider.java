@@ -7,8 +7,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import androidx.core.util.Pair;
 import android.util.Log;
+
+import androidx.core.util.Pair;
 
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
@@ -16,10 +17,10 @@ import com.google.android.gms.maps.model.TileProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import mil.nga.mgrs.wgs84.LatLng;
 import mil.nga.mgrs.Line;
-import mil.nga.mgrs.TileBoundingBoxUtils;
 import mil.nga.mgrs.R;
+import mil.nga.mgrs.TileBoundingBoxUtils;
+import mil.nga.mgrs.wgs84.LatLng;
 
 /**
  * Created by wnewman on 11/17/16.
@@ -69,8 +70,8 @@ public class GZDGridTileProvider implements TileProvider {
         Bitmap bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        double[] boundingBox = getBoundingBox(x, y, zoom);
-        double[] webMercatorBoundingBox = getWebMercatorBoundingBox(x, y, zoom);
+        double[] boundingBox = TileBoundingBoxUtils.getBoundingBox(x, y, zoom);
+        double[] webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
 
 
         for (GridZoneDesignator gridZone : GZDZones.zonesWithin(boundingBox)) {
@@ -137,7 +138,7 @@ public class GZDGridTileProvider implements TileProvider {
         double centerLon = ((zoneBounds[2] - zoneBounds[0]) / 2.0) + zoneBounds[0];
         double centerLat = ((zoneBounds[3] - zoneBounds[1]) / 2.0) + zoneBounds[1];
 
-        double[] meters = degreesToMeters(new LatLng(centerLat, centerLon));
+        double[] meters = TileBoundingBoxUtils.degreesToMeters(new LatLng(centerLat, centerLon));
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
 
@@ -154,12 +155,12 @@ public class GZDGridTileProvider implements TileProvider {
      */
     private void addPolyline(double[] boundingBox, Path path, Line line) {
 
-        double[] meters = degreesToMeters(line.p1);
+        double[] meters = TileBoundingBoxUtils.degreesToMeters(line.p1);
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
         path.moveTo(x, y);
 
-        meters = degreesToMeters(line.p2);
+        meters = TileBoundingBoxUtils.degreesToMeters(line.p2);
         x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
         y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
         path.lineTo(x, y);
@@ -185,95 +186,6 @@ public class GZDGridTileProvider implements TileProvider {
             byteStream.close();
         }
         return bytes;
-    }
-
-    /**
-     * Get the Web Mercator tile bounding box from the Google Maps API tile
-     * coordinates and zoom level
-     *
-     * @param x
-     *            x coordinate
-     * @param y
-     *            y coordinate
-     * @param zoom
-     *            zoom level
-     * @return bounding box
-     */
-    public static double[] getWebMercatorBoundingBox(long x, long y, int zoom) {
-
-        int tilesPerSide = tilesPerSide(zoom);
-        double tileSize = tileSize(tilesPerSide);
-
-        double minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH) + (x * tileSize);
-        double maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH) + ((x + 1) * tileSize);
-        double minLat = WEB_MERCATOR_HALF_WORLD_WIDTH - ((y + 1) * tileSize);
-        double maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH - (y * tileSize);
-
-        return new double[] {minLon, minLat, maxLon, maxLat};
-    }
-
-    /**
-     * Get the tile bounding box from the Google Maps API tile
-     * coordinates and zoom level
-     *
-     * @param x
-     *            x coordinate
-     * @param y
-     *            y coordinate
-     * @param zoom
-     *            zoom level
-     * @return bounding box
-     */
-    public static double[] getBoundingBox(long x, long y, int zoom) {
-
-        double[] bbox  = new double[]{
-            tileToLongitue(x, zoom),
-            tileToLatitude(y+1, zoom),
-            tileToLongitue(x+1, zoom),
-            tileToLatitude(y, zoom),
-        };
-
-        return bbox;
-    }
-
-    private static double tileToLongitue(long x, long zoom) {
-        return (x / Math.pow(2, zoom) * 360 - 180);
-    }
-
-    private static double tileToLatitude(long y, long zoom) {
-        double n = Math.PI - 2 * Math.PI * y / Math.pow(2, zoom);
-        return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
-    }
-
-
-    /**
-     * Get the tiles per side, width and height, at the zoom level
-     *
-     * @param zoom
-     *            zoom level
-     * @return tiles per side
-     */
-    public static int tilesPerSide(int zoom) {
-        return (int) Math.pow(2, zoom);
-    }
-
-
-    /**
-     * Get the tile size in meters
-     *
-     * @param tilesPerSide
-     *            tiles per side
-     * @return tile size
-     */
-    public static double tileSize(int tilesPerSide) {
-        return (2 * WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
-    }
-
-    private static double[] degreesToMeters(LatLng latLng) {
-        double x = latLng.longitude * WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-        double y = Math.log(Math.tan((90 + latLng.latitude) * Math.PI / 360)) / (Math.PI / 180);
-        y = y * WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-        return new double[] {x, y};
     }
 
     private boolean gzdWithinBounds(Pair<Double, Double> gzdZone, double[] bounds) {
