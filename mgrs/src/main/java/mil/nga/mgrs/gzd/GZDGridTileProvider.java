@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.Tile;
@@ -168,9 +168,9 @@ public class GZDGridTileProvider implements TileProvider {
     /**
      * Compress the bitmap to a byte array
      *
-     * @param bitmap
-     * @return
-     * @throws IOException
+     * @param bitmap bitmap
+     * @return bytes
+     * @throws IOException upon error
      */
     public static byte[] toBytes(Bitmap bitmap) throws IOException {
         Bitmap.CompressFormat format = Bitmap.CompressFormat.PNG;

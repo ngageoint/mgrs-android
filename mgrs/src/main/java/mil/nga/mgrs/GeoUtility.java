@@ -12,16 +12,12 @@ public class GeoUtility {
     /**
      * The column letters (for easting) of the lower left value, per
      * set.
-     *
-     * {string} @private
      */
     private static final String SET_ORIGIN_COLUMN_LETTERS = "AJSAJS";
 
     /**
      * The row letters (for northing) of the lower left value, per
      * set.
-     *
-     * {string} @private
      */
     private static final String SET_ORIGIN_ROW_LETTERS = "AFAFAF";
 
@@ -273,10 +269,9 @@ public class GeoUtility {
      * Get the two letter 100k designator for a given UTM easting,
      * northing and zone number value.
      *
-     * @private
-     * @param {number} easting
-     * @param {number} northing
-     * @param {number} zoneNumber
+     * @param easting easting
+     * @param northing northing
+     * @param zoneNumber zone number
      * @return the two letter 100k designator for the given UTM location.
      */
     public static String get100KId(double easting, double northing, Integer zoneNumber) {
@@ -290,9 +285,8 @@ public class GeoUtility {
     /**
      * Given a UTM zone number, figure out the MGRS 100K set it is in.
      *
-     * @private
-     * @param {number} zoneNumber An UTM zone number.
-     * @return {number} the 100k set the UTM zone is in.
+     * @param zoneNumber An UTM zone number.
+     * @return the 100k set the UTM zone is in.
      */
     private static int get100kSetForZone(Integer zoneNumber) {
         int setParm = zoneNumber % NUM_100K_SETS;
@@ -307,14 +301,13 @@ public class GeoUtility {
      * Get the two-letter MGRS 100k designator given information
      * translated from the UTM northing, easting and zone number.
      *
-     * @private
-     * @param {number} column the column index as it relates to the MGRS
+     * @param column the column index as it relates to the MGRS
      *        100k set spreadsheet, created from the UTM easting.
      *        Values are 1-8.
-     * @param {number} row the row index as it relates to the MGRS 100k set
+     * @param row the row index as it relates to the MGRS 100k set
      *        spreadsheet, created from the UTM northing value. Values
      *        are from 0-19.
-     * @param {number} parm the set block, as it relates to the MGRS 100k set
+     * @param parm the set block, as it relates to the MGRS 100k set
      *        spreadsheet, created from the UTM zone. Values are from
      *        1-60.
      * @return two letter MGRS 100k code.
@@ -389,11 +382,9 @@ public class GeoUtility {
     /**
      * Encodes a UTM location as MGRS string.
      *
-     * @private
-     * @param {object} utm An object literal with easting, northing,
-     *     zoneLetter, zoneNumber
-     * @param {number} accuracy Accuracy in digits (1-5).
-     * @return {string} MGRS string for the given UTM location.
+     * @param latLng coordinate
+     * @param accuracy Accuracy in digits (1-5).
+     * @return MGRS string for the given UTM location.
      */
     public static String latLngToMGRS(LatLng latLng, int accuracy) {
         UTM utm = latLngToUtm(latLng.latitude, latLng.longitude);

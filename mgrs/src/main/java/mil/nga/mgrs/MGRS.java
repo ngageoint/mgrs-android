@@ -81,7 +81,7 @@ public class MGRS {
     /**
      * Return whether the given string is valid MGRS string
      *
-     * @param {String} potential MGRS string.
+     * @param mgrs potential MGRS string.
      * @return true if MGRS string is valid, false otherwise.
      */
     public static boolean isMGRS(String mgrs) {
@@ -91,8 +91,8 @@ public class MGRS {
     /**
      * Encodes a latitude/longitude as MGRS string.
      *
-     * @param {object} LatLng An object literal latitude and longitude
-     * @return {object} MGRS mgrs.
+     * @param latLng An object literal latitude and longitude
+     * @return MGRS
      */
     public static MGRS from(LatLng latLng) {
         UTM utm = UTM.from(latLng);
@@ -171,10 +171,9 @@ public class MGRS {
      * Get the two letter 100k designator for a given UTM easting,
      * northing and zone number value.
      *
-     * @private
-     * @param {number} easting
-     * @param {number} northing
-     * @param {number} zoneNumber
+     * @param easting easting
+     * @param northing northing
+     * @param zoneNumber zone number
      * @return the two letter 100k designator for the given UTM location.
      */
     public static String get100KId(double easting, double northing, Integer zoneNumber) {

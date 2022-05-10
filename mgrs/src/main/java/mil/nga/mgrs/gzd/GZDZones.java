@@ -1,6 +1,6 @@
 package mil.nga.mgrs.gzd;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
