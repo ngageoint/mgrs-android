@@ -9,28 +9,23 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.Log;
 
-import androidx.core.util.Pair;
-
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import mil.nga.mgrs.Line;
+import mil.nga.mgrs.MGRSConstants;
+import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.R;
-import mil.nga.mgrs.TileBoundingBoxUtils;
-import mil.nga.mgrs.wgs84.LatLng;
+import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.features.LatLngLine;
+import mil.nga.mgrs.features.Point;
 
 /**
- * Created by wnewman on 11/17/16.
+ * GZD Grid Tile Provider
+ *
+ * @author wnewman
+ * @author osbornb
  */
 public class GZDGridTileProvider implements TileProvider {
-
-    /**
-     * Half the world distance in either direction
-     */
-    public static double WEB_MERCATOR_HALF_WORLD_WIDTH = 20037508.342789244;
 
     private static int TEXT_SIZE = 16;
 
@@ -45,48 +40,53 @@ public class GZDGridTileProvider implements TileProvider {
         tileHeight = context.getResources().getInteger(R.integer.tile_height);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tile getTile(int x, int y, int zoom) {
 
         Bitmap bitmap = drawTile(x, y, zoom);
 
-        byte[] bytes = null;
-        try {
-            bytes = toBytes(bitmap);
-        } catch (IOException e) {
-            // uhhhh
-            Log.e("FOO", "UHH", e);
+        byte[] bytes = TileUtils.toBytes(bitmap);
+
+        Tile tile = null;
+        if (bytes != null) {
+            tile = new Tile(tileWidth, tileHeight, bytes);
         }
 
-        Tile tile = new Tile(tileWidth, tileHeight, bytes);
-
         return tile;
-
-
     }
 
+    /**
+     * Draw the tile
+     *
+     * @param x    x coordinate
+     * @param y    y coordinate
+     * @param zoom zoom level
+     * @return bitmap
+     */
     private Bitmap drawTile(int x, int y, int zoom) {
 
         Bitmap bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        double[] boundingBox = TileBoundingBoxUtils.getBoundingBox(x, y, zoom);
-        double[] webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
+        double[] boundingBox = MGRSUtils.getBoundingBox(x, y, zoom);
+        double[] webMercatorBoundingBox = MGRSUtils.getWebMercatorBoundingBox(x, y, zoom);
 
+        for (GridZone gridZone : GridZones.getGridRange(boundingBox)) {
+            Bounds gridBounds = gridZone.getBounds();
+            Double minLat = gridBounds.getMinLatitude();
+            Double maxLat = gridBounds.getMaxLatitude();
 
-        for (GridZoneDesignator gridZone : GZDZones.zonesWithin(boundingBox)) {
-            double[] gridBounds = gridZone.zoneBounds();
-            Double minLat = gridBounds[1];
-            Double maxLat = gridBounds[3];
+            Double minLon = gridBounds.getMinLongitude();
+            Double maxLon = gridBounds.getMaxLongitude();
 
-            Double minLon = gridBounds[0];
-            Double maxLon = gridBounds[2];
+            drawLine(webMercatorBoundingBox, canvas, new LatLngLine(new LatLng(maxLat, minLon), new LatLng(maxLat, maxLon)), Color.RED);
+            drawLine(webMercatorBoundingBox, canvas, new LatLngLine(new LatLng(minLat, maxLon), new LatLng(maxLat, maxLon)), Color.RED);
 
-            drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(maxLat, minLon), new LatLng(maxLat, maxLon)), Color.RED);
-            drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, maxLon), new LatLng(maxLat, maxLon)), Color.RED);
-
-            if (gridZone.zoneLetter().equals('C')) {
-                drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, minLon), new LatLng(minLat, maxLon)), Color.RED);
+            if (gridZone.getLetter() == MGRSConstants.MIN_BAND_LETTER) {
+                drawLine(webMercatorBoundingBox, canvas, new LatLngLine(new LatLng(minLat, minLon), new LatLng(minLat, maxLon)), Color.RED);
             }
 
             if (zoom > 3) {
@@ -103,7 +103,7 @@ public class GZDGridTileProvider implements TileProvider {
      * @param boundingBox
      * @param canvas
      */
-    private void drawLine(double[] boundingBox, Canvas canvas, Line line, int color) {
+    private void drawLine(double[] boundingBox, Canvas canvas, LatLngLine line, int color) {
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -118,9 +118,9 @@ public class GZDGridTileProvider implements TileProvider {
 
     }
 
-    private void drawName(Bitmap bitmap, GridZoneDesignator gridZone, double[] boundingBox, Canvas canvas) {
+    private void drawName(Bitmap bitmap, GridZone gridZone, double[] boundingBox, Canvas canvas) {
 
-        String name = gridZone.zoneNumber().toString() + gridZone.zoneLetter();
+        String name = Integer.toString(gridZone.getNumber()) + gridZone.getLetter();
         Log.e("GZD GRID NAME", name);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -133,14 +133,10 @@ public class GZDGridTileProvider implements TileProvider {
         paint.getTextBounds(name, 0, name.length(), textBounds);
 
         // Determine the center of the tile
-        // TODO determine the center of the bounding box for this grid
-        double[] zoneBounds = gridZone.zoneBounds();
-        double centerLon = ((zoneBounds[2] - zoneBounds[0]) / 2.0) + zoneBounds[0];
-        double centerLat = ((zoneBounds[3] - zoneBounds[1]) / 2.0) + zoneBounds[1];
-
-        double[] meters = TileBoundingBoxUtils.degreesToMeters(new LatLng(centerLat, centerLon));
-        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
-        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
+        Bounds zoneBounds = gridZone.getBounds();
+        Point point = zoneBounds.getCenterPoint();
+        float x = MGRSUtils.getXPixel(tileWidth, boundingBox, point.getX());
+        float y = MGRSUtils.getYPixel(tileHeight, boundingBox, point.getY());
 
         // Draw the text
         canvas.drawText(name, x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), paint);
@@ -153,43 +149,17 @@ public class GZDGridTileProvider implements TileProvider {
      * @param path
      * @param line
      */
-    private void addPolyline(double[] boundingBox, Path path, Line line) {
+    private void addPolyline(double[] boundingBox, Path path, LatLngLine line) {
 
-        double[] meters = TileBoundingBoxUtils.degreesToMeters(line.p1);
-        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
-        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
+        Point point = line.getCoordinate1().toPoint();
+        float x = MGRSUtils.getXPixel(tileWidth, boundingBox, point.getX());
+        float y = MGRSUtils.getYPixel(tileHeight, boundingBox, point.getY());
         path.moveTo(x, y);
 
-        meters = TileBoundingBoxUtils.degreesToMeters(line.p2);
-        x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
-        y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
+        point = line.getCoordinate2().toPoint();
+        x = MGRSUtils.getXPixel(tileWidth, boundingBox, point.getX());
+        y = MGRSUtils.getYPixel(tileHeight, boundingBox, point.getY());
         path.lineTo(x, y);
     }
 
-    /**
-     * Compress the bitmap to a byte array
-     *
-     * @param bitmap bitmap
-     * @return bytes
-     * @throws IOException upon error
-     */
-    public static byte[] toBytes(Bitmap bitmap) throws IOException {
-        Bitmap.CompressFormat format = Bitmap.CompressFormat.PNG;
-        int quality = 100;
-
-        byte[] bytes = null;
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try {
-            bitmap.compress(format, quality, byteStream);
-            bytes = byteStream.toByteArray();
-        } finally {
-            byteStream.close();
-        }
-        return bytes;
-    }
-
-    private boolean gzdWithinBounds(Pair<Double, Double> gzdZone, double[] bounds) {
-
-        return false;
-    }
 }

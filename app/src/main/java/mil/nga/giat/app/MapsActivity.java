@@ -13,8 +13,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.app.R;
+import mil.nga.mgrs.features.LatLng;
 import mil.nga.mgrs.gzd.MGRSTileProvider;
-import mil.nga.mgrs.wgs84.LatLng;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 

@@ -14,71 +14,97 @@ import android.util.Log;
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 import mil.nga.mgrs.Label;
 import mil.nga.mgrs.MGRSTile;
+import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.R;
-import mil.nga.mgrs.TileBoundingBoxUtils;
-import mil.nga.mgrs.wgs84.LatLng;
-import mil.nga.mgrs.wgs84.Line;
-import mil.nga.mgrs.wgs84.Point;
+import mil.nga.mgrs.features.Line;
+import mil.nga.mgrs.features.Point;
 
 /**
- * Created by wnewman on 1/5/17.
+ * MGRS Tile Provider
+ *
+ * @author wnewman
+ * @author osbornb
  */
 public class MGRSTileProvider implements TileProvider {
 
+    /**
+     * Tile width
+     */
     private int tileWidth;
+
+    /**
+     * Tile height
+     */
     private int tileHeight;
 
+    /**
+     * Constructor
+     *
+     * @param context context
+     */
     public MGRSTileProvider(Context context) {
         tileWidth = context.getResources().getInteger(R.integer.tile_width);
         tileHeight = context.getResources().getInteger(R.integer.tile_height);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tile getTile(int x, int y, int zoom) {
 
-
         Bitmap bitmap = drawTile(x, y, zoom);
-        if (bitmap == null) return null;
 
-        byte[] bytes = null;
-        try {
-            bytes = toBytes(bitmap);
-        } catch (IOException e) {
+        byte[] bytes = TileUtils.toBytes(bitmap);
+
+        Tile tile = null;
+        if (bytes != null) {
+            tile = new Tile(tileWidth, tileHeight, bytes);
         }
-
-        Tile tile = new Tile(tileWidth, tileHeight, bytes);
 
         return tile;
     }
 
+    /**
+     * Draw the tile
+     *
+     * @param x    x coordinate
+     * @param y    y coordinate
+     * @param zoom zoom level
+     * @return bitmap
+     */
     private Bitmap drawTile(int x, int y, int zoom) {
-        Bitmap bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
+        Bitmap bitmap = null;
 
-        MGRSTile mgrsTile = new MGRSTile(tileWidth, tileHeight, x, y, zoom);
+        Grids grids = Grid.getGrids(zoom);
+        if (grids.hasGrids()) {
 
-        Collection<GridZoneDesignator> zones = GZDZones.zonesWithin(mgrsTile.getBoundingBox());
+            bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
 
-        for (Grid grid : Grid.values()) {
-            if (grid.contains(zoom)) {
+            MGRSTile mgrsTile = new MGRSTile(tileWidth, tileHeight, x, y, zoom);
+
+            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBoundingBox());
+
+            for (Grid grid : grids) {
+
                 // draw this grid for each zone
-                for (GridZoneDesignator zone : zones) {
-                    Collection<Line> lines = zone.lines(mgrsTile.getBoundingBox(), grid.getPrecision());
+                for (GridZone zone : gridRange) {
+
+                    List<Line> lines = zone.getLines(mgrsTile.getBoundingBox(), grid.getPrecision());
                     drawLines(lines, mgrsTile, zone, canvas);
 
                     if (grid == Grid.GZD && zoom > 3) {
-                        Collection<Label> labels = zone.labels(mgrsTile.getBoundingBox(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(mgrsTile.getBoundingBox(), grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
 
                     if (grid == Grid.HUNDRED_KILOMETER && zoom > 5) {
-                        Collection<Label> labels = zone.labels(mgrsTile.getBoundingBox(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(mgrsTile.getBoundingBox(), grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
                 }
@@ -88,41 +114,18 @@ public class MGRSTileProvider implements TileProvider {
         return bitmap;
     }
 
-    /**
-     * Compress the bitmap to a byte array
-     *
-     * @param bitmap bitmap
-     * @return bytes
-     * @throws IOException upon error
-     */
-    public static byte[] toBytes(Bitmap bitmap) throws IOException {
-        Bitmap.CompressFormat format = Bitmap.CompressFormat.PNG;
-        int quality = 100;
-
-        byte[] bytes = null;
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try {
-            bitmap.compress(format, quality, byteStream);
-            bytes = byteStream.toByteArray();
-        } finally {
-            byteStream.close();
-        }
-
-        return bytes;
-    }
-
-    public void drawLines(Collection<Line> lines, MGRSTile tile, GridZoneDesignator zone, Canvas canvas) {
-        double[] zoneBounds = zone.zoneBounds();
-        Point zoneLowerLeft = new Point(new LatLng(zoneBounds[1], zoneBounds[0]));
-        Point zoneUpperRight = new Point(new LatLng(zoneBounds[3], zoneBounds[2]));
-        double[] zoneBoundingBox = new double[]{zoneLowerLeft.x, zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y};
+    private void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas) {
+        Bounds zoneBounds = zone.getBounds();
+        Point zoneLowerLeft = zoneBounds.getSouthwestPoint();
+        Point zoneUpperRight = zoneBounds.getNortheastPoint();
+        double[] zoneBoundingBox = new double[]{zoneLowerLeft.getX(), zoneLowerLeft.getY(), zoneUpperRight.getX(), zoneUpperRight.getY()};
 
         for (Line line : lines) {
             drawLine(line, tile, zoneBoundingBox, canvas);
         }
     }
 
-    public void drawLabels(Collection<Label> labels, MGRSTile tile, GridZoneDesignator zone, Canvas canvas) {
+    private void drawLabels(List<Label> labels, MGRSTile tile, GridZone zone, Canvas canvas) {
         for (Label label : labels) {
             drawLabel(label, tile, canvas);
         }
@@ -142,10 +145,10 @@ public class MGRSTileProvider implements TileProvider {
         linePaint.setColor(Color.rgb(239, 83, 80));
 
         double[] bbox = tile.getWebMercatorBoundingBox();
-        float left = TileBoundingBoxUtils.getXPixel(tile.getWidth(), bbox, clipBox[0]);
-        float top = TileBoundingBoxUtils.getYPixel(tile.getHeight(), bbox, clipBox[3]);
-        float right = TileBoundingBoxUtils.getXPixel(tile.getWidth(), bbox, clipBox[2]);
-        float bottom = TileBoundingBoxUtils.getYPixel(tile.getHeight(), bbox, clipBox[1]);
+        float left = MGRSUtils.getXPixel(tile.getWidth(), bbox, clipBox[0]);
+        float top = MGRSUtils.getYPixel(tile.getHeight(), bbox, clipBox[3]);
+        float right = MGRSUtils.getXPixel(tile.getWidth(), bbox, clipBox[2]);
+        float bottom = MGRSUtils.getYPixel(tile.getHeight(), bbox, clipBox[1]);
         canvas.clipRect(left, top, right, bottom, Region.Op.INTERSECT);
 
         Path linePath = new Path();
@@ -164,12 +167,12 @@ public class MGRSTileProvider implements TileProvider {
      */
     private void addPolyline(MGRSTile tile, Path path, Line line) {
         double[] bbox = tile.getWebMercatorBoundingBox();
-        float x = TileBoundingBoxUtils.getXPixel(tile.getWidth(), bbox, line.p1.x);
-        float y = TileBoundingBoxUtils.getYPixel(tile.getHeight(), bbox, line.p1.y);
+        float x = MGRSUtils.getXPixel(tile.getWidth(), bbox, line.getPoint1().getX());
+        float y = MGRSUtils.getYPixel(tile.getHeight(), bbox, line.getPoint1().getY());
         path.moveTo(x, y);
 
-        x = TileBoundingBoxUtils.getXPixel(tile.getWidth(), bbox, line.p2.x);
-        y = TileBoundingBoxUtils.getYPixel(tile.getHeight(), bbox, line.p2.y);
+        x = MGRSUtils.getXPixel(tile.getWidth(), bbox, line.getPoint2().getX());
+        y = MGRSUtils.getYPixel(tile.getHeight(), bbox, line.getPoint2().getY());
         path.lineTo(x, y);
     }
 
@@ -187,22 +190,22 @@ public class MGRSTileProvider implements TileProvider {
 
         double[] tileBoundingBox = tile.getWebMercatorBoundingBox();
         double[] labelBoundingBox = label.getBoundingBox();
-        float minX = TileBoundingBoxUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[0]);
-        float maxX = TileBoundingBoxUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[2]);
+        float minX = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[0]);
+        float maxX = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[2]);
         float zoneWidth = maxX - minX;
 
-        float minY = TileBoundingBoxUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[3]);
-        float maxY = TileBoundingBoxUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[1]);
+        float minY = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[3]);
+        float maxY = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[1]);
         float zoneHeight = maxY - minY;
 
-        float x = TileBoundingBoxUtils.getXPixel(tile.getWidth(), tileBoundingBox, label.getCenter().x);
-        float y = TileBoundingBoxUtils.getYPixel(tile.getHeight(), tileBoundingBox, label.getCenter().y);
+        float x = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, label.getCenter().getX());
+        float y = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, label.getCenter().getY());
 
         if (label.getName().equals("KV") || label.getName().equals("GE")) {
             Log.i("", "");
         }
 
-        float textWidth =oneHundredKLabelPaint.measureText(label.getName(), 0, label.getName().length());
+        float textWidth = oneHundredKLabelPaint.measureText(label.getName(), 0, label.getName().length());
 
         double textWidthPercent = textWidth * 2 / zoneWidth;
         double textHeightPercent = textBounds.height() * 2 / zoneHeight;
