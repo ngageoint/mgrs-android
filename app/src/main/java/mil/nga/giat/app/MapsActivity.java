@@ -13,7 +13,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.app.R;
-import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.MGRSTileProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
@@ -55,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onCameraIdle() {
         com.google.android.gms.maps.model.LatLng center = map.getCameraPosition().target;
-        MGRS mgrs = MGRS.from(new LatLng(center.latitude, center.longitude));
+        MGRS mgrs = MGRS.from(Point.degrees(center.latitude, center.longitude));
         mgrsLabel.setText(mgrs.format(4));
     }
 }

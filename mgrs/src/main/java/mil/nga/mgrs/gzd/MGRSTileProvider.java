@@ -21,6 +21,7 @@ import mil.nga.mgrs.MGRSTile;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.R;
 import mil.nga.mgrs.features.Line;
+import mil.nga.mgrs.features.Pixel;
 import mil.nga.mgrs.features.Point;
 
 /**
@@ -88,23 +89,23 @@ public class MGRSTileProvider implements TileProvider {
 
             MGRSTile mgrsTile = new MGRSTile(tileWidth, tileHeight, x, y, zoom);
 
-            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBoundingBox());
+            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBounds());
 
             for (Grid grid : grids) {
 
                 // draw this grid for each zone
                 for (GridZone zone : gridRange) {
 
-                    List<Line> lines = zone.getLines(mgrsTile.getBoundingBox(), grid.getPrecision());
+                    List<Line> lines = zone.getLines(mgrsTile.getBounds(), grid.getPrecision());
                     drawLines(lines, mgrsTile, zone, canvas);
 
                     if (grid == Grid.GZD && zoom > 3) {
-                        List<Label> labels = zone.getLabels(mgrsTile.getBoundingBox(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(mgrsTile.getBounds(), grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
 
                     if (grid == Grid.HUNDRED_KILOMETER && zoom > 5) {
-                        List<Label> labels = zone.getLabels(mgrsTile.getBoundingBox(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(mgrsTile.getBounds(), grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
                 }
@@ -115,13 +116,9 @@ public class MGRSTileProvider implements TileProvider {
     }
 
     private void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas) {
-        Bounds zoneBounds = zone.getBounds();
-        Point zoneLowerLeft = zoneBounds.getSouthwestPoint();
-        Point zoneUpperRight = zoneBounds.getNortheastPoint();
-        double[] zoneBoundingBox = new double[]{zoneLowerLeft.getX(), zoneLowerLeft.getY(), zoneUpperRight.getX(), zoneUpperRight.getY()};
-
+        Bounds zoneBounds = zone.getBounds().toMeters();
         for (Line line : lines) {
-            drawLine(line, tile, zoneBoundingBox, canvas);
+            drawLine(line, tile, zoneBounds, canvas);
         }
     }
 
@@ -134,7 +131,7 @@ public class MGRSTileProvider implements TileProvider {
     /**
      * Draw the shape on the canvas
      */
-    private void drawLine(Line line, MGRSTile tile, double[] clipBox, Canvas canvas) {
+    private void drawLine(Line line, MGRSTile tile, Bounds clipBounds, Canvas canvas) {
         canvas.save();
 
         // TODO grid based paint
@@ -144,11 +141,12 @@ public class MGRSTileProvider implements TileProvider {
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setColor(Color.rgb(239, 83, 80));
 
-        double[] bbox = tile.getWebMercatorBoundingBox();
-        float left = MGRSUtils.getXPixel(tile.getWidth(), bbox, clipBox[0]);
-        float top = MGRSUtils.getYPixel(tile.getHeight(), bbox, clipBox[3]);
-        float right = MGRSUtils.getXPixel(tile.getWidth(), bbox, clipBox[2]);
-        float bottom = MGRSUtils.getYPixel(tile.getHeight(), bbox, clipBox[1]);
+        Bounds bounds = tile.getWebMercatorBounds();
+        clipBounds = clipBounds.toMeters();
+        float left = MGRSUtils.getXPixel(tile.getWidth(), bounds, clipBounds.getMinLongitude());
+        float top = MGRSUtils.getYPixel(tile.getHeight(), bounds, clipBounds.getMaxLatitude());
+        float right = MGRSUtils.getXPixel(tile.getWidth(), bounds, clipBounds.getMaxLongitude());
+        float bottom = MGRSUtils.getYPixel(tile.getHeight(), bounds, clipBounds.getMinLatitude());
         canvas.clipRect(left, top, right, bottom, Region.Op.INTERSECT);
 
         Path linePath = new Path();
@@ -166,14 +164,19 @@ public class MGRSTileProvider implements TileProvider {
      * @param line
      */
     private void addPolyline(MGRSTile tile, Path path, Line line) {
-        double[] bbox = tile.getWebMercatorBoundingBox();
-        float x = MGRSUtils.getXPixel(tile.getWidth(), bbox, line.getPoint1().getX());
-        float y = MGRSUtils.getYPixel(tile.getHeight(), bbox, line.getPoint1().getY());
-        path.moveTo(x, y);
 
-        x = MGRSUtils.getXPixel(tile.getWidth(), bbox, line.getPoint2().getX());
-        y = MGRSUtils.getYPixel(tile.getHeight(), bbox, line.getPoint2().getY());
-        path.lineTo(x, y);
+        line = line.toMeters();
+        Point point1 = line.getPoint1();
+        Point point2 = line.getPoint2();
+
+        Bounds bounds = tile.getWebMercatorBounds();
+
+        Pixel pixel = point1.getPixel(tile, bounds);
+        path.moveTo(pixel.getX(), pixel.getY());
+
+        Pixel pixel2 = point2.getPixel(tile, bounds);
+        path.lineTo(pixel2.getX(), pixel2.getY());
+
     }
 
     private void drawLabel(Label label, MGRSTile tile, Canvas canvas) {
@@ -188,18 +191,18 @@ public class MGRSTileProvider implements TileProvider {
         Rect textBounds = new Rect();
         oneHundredKLabelPaint.getTextBounds(label.getName(), 0, label.getName().length(), textBounds);
 
-        double[] tileBoundingBox = tile.getWebMercatorBoundingBox();
-        double[] labelBoundingBox = label.getBoundingBox();
-        float minX = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[0]);
-        float maxX = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, labelBoundingBox[2]);
+        Bounds tileBounds = tile.getWebMercatorBounds();
+        Bounds labelBounds = label.getBounds().toMeters();
+        float minX = MGRSUtils.getXPixel(tile.getWidth(), tileBounds, labelBounds.getMinLongitude());
+        float maxX = MGRSUtils.getXPixel(tile.getWidth(), tileBounds, labelBounds.getMaxLongitude());
         float zoneWidth = maxX - minX;
 
-        float minY = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[3]);
-        float maxY = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, labelBoundingBox[1]);
+        float minY = MGRSUtils.getYPixel(tile.getHeight(), tileBounds, labelBounds.getMaxLatitude());
+        float maxY = MGRSUtils.getYPixel(tile.getHeight(), tileBounds, labelBounds.getMinLatitude());
         float zoneHeight = maxY - minY;
 
-        float x = MGRSUtils.getXPixel(tile.getWidth(), tileBoundingBox, label.getCenter().getX());
-        float y = MGRSUtils.getYPixel(tile.getHeight(), tileBoundingBox, label.getCenter().getY());
+        Point center = label.getCenter().toMeters();
+        Pixel centerPixel = center.getPixel(tile, tileBounds);
 
         if (label.getName().equals("KV") || label.getName().equals("GE")) {
             Log.i("", "");
@@ -212,7 +215,7 @@ public class MGRSTileProvider implements TileProvider {
 
 //        if (zoneWidth > textBounds.width() + 20 && zoneHeight > textBounds.height() + 20) {
         if (textWidthPercent < .80 && textHeightPercent < .80 && textBounds.width() < zoneWidth && textBounds.height() < zoneHeight) {
-            canvas.drawText(label.getName(), x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), oneHundredKLabelPaint);
+            canvas.drawText(label.getName(), centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), oneHundredKLabelPaint);
         }
     }
 
