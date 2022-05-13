@@ -18,10 +18,10 @@ import java.util.List;
 
 import mil.nga.mgrs.Label;
 import mil.nga.mgrs.MGRSTile;
-import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.R;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Pixel;
+import mil.nga.mgrs.features.PixelRange;
 import mil.nga.mgrs.features.Point;
 
 /**
@@ -141,13 +141,10 @@ public class MGRSTileProvider implements TileProvider {
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setColor(Color.rgb(239, 83, 80));
 
-        Bounds bounds = tile.getWebMercatorBounds();
-        clipBounds = clipBounds.toMeters();
-        float left = MGRSUtils.getXPixel(tile.getWidth(), bounds, clipBounds.getMinLongitude());
-        float top = MGRSUtils.getYPixel(tile.getHeight(), bounds, clipBounds.getMaxLatitude());
-        float right = MGRSUtils.getXPixel(tile.getWidth(), bounds, clipBounds.getMaxLongitude());
-        float bottom = MGRSUtils.getYPixel(tile.getHeight(), bounds, clipBounds.getMinLatitude());
-        canvas.clipRect(left, top, right, bottom, Region.Op.INTERSECT);
+        Bounds tileBounds = tile.getWebMercatorBounds();
+
+        PixelRange pixelRange = clipBounds.getPixelRange(tile, tileBounds);
+        canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
 
         Path linePath = new Path();
         addPolyline(tile, linePath, line);
@@ -192,14 +189,12 @@ public class MGRSTileProvider implements TileProvider {
         oneHundredKLabelPaint.getTextBounds(label.getName(), 0, label.getName().length(), textBounds);
 
         Bounds tileBounds = tile.getWebMercatorBounds();
-        Bounds labelBounds = label.getBounds().toMeters();
-        float minX = MGRSUtils.getXPixel(tile.getWidth(), tileBounds, labelBounds.getMinLongitude());
-        float maxX = MGRSUtils.getXPixel(tile.getWidth(), tileBounds, labelBounds.getMaxLongitude());
-        float zoneWidth = maxX - minX;
+        Bounds labelBounds = label.getBounds();
 
-        float minY = MGRSUtils.getYPixel(tile.getHeight(), tileBounds, labelBounds.getMaxLatitude());
-        float maxY = MGRSUtils.getYPixel(tile.getHeight(), tileBounds, labelBounds.getMinLatitude());
-        float zoneHeight = maxY - minY;
+        PixelRange pixelRange = labelBounds.getPixelRange(tile, tileBounds);
+
+        float zoneWidth = pixelRange.getMaxX() - pixelRange.getMinX();
+        float zoneHeight = pixelRange.getMaxY() - pixelRange.getMinY();
 
         Point center = label.getCenter().toMeters();
         Pixel centerPixel = center.getPixel(tile, tileBounds);

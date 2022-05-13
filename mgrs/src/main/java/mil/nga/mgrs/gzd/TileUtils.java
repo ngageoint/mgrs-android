@@ -2,8 +2,12 @@ package mil.nga.mgrs.gzd;
 
 import android.graphics.Bitmap;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import mil.nga.mgrs.features.Point;
 
 /**
  * Tile Utils
@@ -37,6 +41,16 @@ public class TileUtils {
         }
 
         return bytes;
+    }
+
+    /**
+     * Convert a map coordinate to a point
+     *
+     * @param latLng map coordinate
+     * @return point
+     */
+    public static Point toPoint(LatLng latLng) {
+        return Point.degrees(latLng.longitude, latLng.latitude);
     }
 
 }
