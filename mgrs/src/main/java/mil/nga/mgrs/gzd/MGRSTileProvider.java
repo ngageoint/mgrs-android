@@ -57,17 +57,8 @@ public class MGRSTileProvider implements TileProvider {
      */
     @Override
     public Tile getTile(int x, int y, int zoom) {
-
         Bitmap bitmap = drawTile(x, y, zoom);
-
-        byte[] bytes = TileUtils.toBytes(bitmap);
-
-        Tile tile = null;
-        if (bytes != null) {
-            tile = new Tile(tileWidth, tileHeight, bytes);
-        }
-
-        return tile;
+        return TileUtils.toTile(bitmap);
     }
 
     /**
@@ -88,24 +79,25 @@ public class MGRSTileProvider implements TileProvider {
             Canvas canvas = new Canvas(bitmap);
 
             MGRSTile mgrsTile = new MGRSTile(tileWidth, tileHeight, x, y, zoom);
+            Bounds bounds = mgrsTile.getBounds().toDegrees();
 
-            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBounds());
+            GridRange gridRange = GridZones.getGridRange(bounds);
 
             for (Grid grid : grids) {
 
                 // draw this grid for each zone
                 for (GridZone zone : gridRange) {
 
-                    List<Line> lines = zone.getLines(mgrsTile.getBounds(), grid.getPrecision());
+                    List<Line> lines = zone.getLines(bounds, grid.getPrecision());
                     drawLines(lines, mgrsTile, zone, canvas);
 
                     if (grid == Grid.GZD && zoom > 3) {
-                        List<Label> labels = zone.getLabels(mgrsTile.getBounds(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
 
                     if (grid == Grid.HUNDRED_KILOMETER && zoom > 5) {
-                        List<Label> labels = zone.getLabels(mgrsTile.getBounds(), grid.getPrecision());
+                        List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
                         drawLabels(labels, mgrsTile, zone, canvas);
                     }
                 }
@@ -115,6 +107,14 @@ public class MGRSTileProvider implements TileProvider {
         return bitmap;
     }
 
+    /**
+     * Draw the lines on the tile
+     *
+     * @param lines  lines to draw
+     * @param tile   tile
+     * @param zone   grid zone
+     * @param canvas draw canvas
+     */
     private void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas) {
         Bounds zoneBounds = zone.getBounds().toMeters();
         for (Line line : lines) {
@@ -122,6 +122,14 @@ public class MGRSTileProvider implements TileProvider {
         }
     }
 
+    /**
+     * Draw the labels on the tile
+     *
+     * @param labels labels to draw
+     * @param tile   tile
+     * @param zone   gris zone
+     * @param canvas draw canvas
+     */
     private void drawLabels(List<Label> labels, MGRSTile tile, GridZone zone, Canvas canvas) {
         for (Label label : labels) {
             drawLabel(label, tile, canvas);
@@ -130,8 +138,13 @@ public class MGRSTileProvider implements TileProvider {
 
     /**
      * Draw the shape on the canvas
+     *
+     * @param line       line to draw
+     * @param tile       tile
+     * @param zoneBounds grid zone bounds
+     * @param canvas     draw canvas
      */
-    private void drawLine(Line line, MGRSTile tile, Bounds clipBounds, Canvas canvas) {
+    private void drawLine(Line line, MGRSTile tile, Bounds zoneBounds, Canvas canvas) {
         canvas.save();
 
         // TODO grid based paint
@@ -141,9 +154,7 @@ public class MGRSTileProvider implements TileProvider {
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setColor(Color.rgb(239, 83, 80));
 
-        Bounds tileBounds = tile.getWebMercatorBounds();
-
-        PixelRange pixelRange = clipBounds.getPixelRange(tile, tileBounds);
+        PixelRange pixelRange = zoneBounds.getPixelRange(tile);
         canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
 
         Path linePath = new Path();
@@ -156,9 +167,9 @@ public class MGRSTileProvider implements TileProvider {
     /**
      * Add the polyline to the path
      *
-     * @param path
-     * @param path
-     * @param line
+     * @param tile tile
+     * @param path line path
+     * @param line line to draw
      */
     private void addPolyline(MGRSTile tile, Path path, Line line) {
 
@@ -166,16 +177,21 @@ public class MGRSTileProvider implements TileProvider {
         Point point1 = line.getPoint1();
         Point point2 = line.getPoint2();
 
-        Bounds bounds = tile.getWebMercatorBounds();
-
-        Pixel pixel = point1.getPixel(tile, bounds);
+        Pixel pixel = point1.getPixel(tile);
         path.moveTo(pixel.getX(), pixel.getY());
 
-        Pixel pixel2 = point2.getPixel(tile, bounds);
+        Pixel pixel2 = point2.getPixel(tile);
         path.lineTo(pixel2.getX(), pixel2.getY());
 
     }
 
+    /**
+     * Draw the label
+     *
+     * @param label  label to draw
+     * @param tile   tile
+     * @param canvas draw canvas
+     */
     private void drawLabel(Label label, MGRSTile tile, Canvas canvas) {
 
         // TODO grid based paint
@@ -188,16 +204,8 @@ public class MGRSTileProvider implements TileProvider {
         Rect textBounds = new Rect();
         oneHundredKLabelPaint.getTextBounds(label.getName(), 0, label.getName().length(), textBounds);
 
-        Bounds tileBounds = tile.getWebMercatorBounds();
-        Bounds labelBounds = label.getBounds();
-
-        PixelRange pixelRange = labelBounds.getPixelRange(tile, tileBounds);
-
-        float zoneWidth = pixelRange.getMaxX() - pixelRange.getMinX();
-        float zoneHeight = pixelRange.getMaxY() - pixelRange.getMinY();
-
-        Point center = label.getCenter().toMeters();
-        Pixel centerPixel = center.getPixel(tile, tileBounds);
+        Point center = label.getCenter();
+        Pixel centerPixel = center.getPixel(tile);
 
         if (label.getName().equals("KV") || label.getName().equals("GE")) {
             Log.i("", "");
@@ -205,10 +213,13 @@ public class MGRSTileProvider implements TileProvider {
 
         float textWidth = oneHundredKLabelPaint.measureText(label.getName(), 0, label.getName().length());
 
+        PixelRange pixelRange = label.getBounds().getPixelRange(tile);
+        float zoneWidth = pixelRange.getWidth();
+        float zoneHeight = pixelRange.getHeight();
+
         double textWidthPercent = textWidth * 2 / zoneWidth;
         double textHeightPercent = textBounds.height() * 2 / zoneHeight;
 
-//        if (zoneWidth > textBounds.width() + 20 && zoneHeight > textBounds.height() + 20) {
         if (textWidthPercent < .80 && textHeightPercent < .80 && textBounds.width() < zoneWidth && textBounds.height() < zoneHeight) {
             canvas.drawText(label.getName(), centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), oneHundredKLabelPaint);
         }

@@ -3,6 +3,7 @@ package mil.nga.mgrs.gzd;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Tile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,6 +42,25 @@ public class TileUtils {
         }
 
         return bytes;
+    }
+
+    /**
+     * Compress the bitmap to a tile
+     *
+     * @param bitmap bitmap
+     * @return tile
+     */
+    public static Tile toTile(Bitmap bitmap) {
+
+        Tile tile = null;
+
+        byte[] bytes = toBytes(bitmap);
+
+        if (bytes != null) {
+            tile = new Tile(bitmap.getWidth(), bitmap.getHeight(), bytes);
+        }
+
+        return tile;
     }
 
     /**

@@ -27,15 +27,33 @@ import mil.nga.mgrs.features.Point;
  */
 public class GZDGridTileProvider implements TileProvider {
 
-    private static int TEXT_SIZE = 16;
+    /**
+     * Name text size
+     */
+    private static final int TEXT_SIZE = 16;
 
+    /**
+     * Context
+     */
     private Context context;
+
+    /**
+     * Tile width
+     */
     private int tileWidth;
+
+    /**
+     * Tile height
+     */
     private int tileHeight;
 
+    /**
+     * Constructor
+     *
+     * @param context context
+     */
     public GZDGridTileProvider(Context context) {
         this.context = context;
-
         tileWidth = context.getResources().getInteger(R.integer.tile_width);
         tileHeight = context.getResources().getInteger(R.integer.tile_height);
     }
@@ -45,17 +63,8 @@ public class GZDGridTileProvider implements TileProvider {
      */
     @Override
     public Tile getTile(int x, int y, int zoom) {
-
         Bitmap bitmap = drawTile(x, y, zoom);
-
-        byte[] bytes = TileUtils.toBytes(bitmap);
-
-        Tile tile = null;
-        if (bytes != null) {
-            tile = new Tile(tileWidth, tileHeight, bytes);
-        }
-
-        return tile;
+        return TileUtils.toTile(bitmap);
     }
 
     /**
@@ -72,25 +81,23 @@ public class GZDGridTileProvider implements TileProvider {
         Canvas canvas = new Canvas(bitmap);
 
         Bounds bounds = MGRSUtils.getBounds(x, y, zoom);
-        Bounds webMercatorBounds = MGRSUtils.getWebMercatorBounds(x, y, zoom);
 
         for (GridZone gridZone : GridZones.getGridRange(bounds)) {
+
             Bounds gridBounds = gridZone.getBounds();
-            Double minLat = gridBounds.getMinLatitude();
-            Double maxLat = gridBounds.getMaxLatitude();
 
-            Double minLon = gridBounds.getMinLongitude();
-            Double maxLon = gridBounds.getMaxLongitude();
+            Point northeast = gridBounds.getNortheast();
+            Point southeast = gridBounds.getSoutheast();
 
-            drawLine(webMercatorBounds, canvas, Line.line(Point.degrees(minLon, maxLat), Point.degrees(maxLon, maxLat)), Color.RED);
-            drawLine(webMercatorBounds, canvas, Line.line(Point.degrees(maxLon, minLat), Point.degrees(maxLon, maxLat)), Color.RED);
+            drawLine(bounds, canvas, Line.line(gridBounds.getNorthwest(), northeast), Color.RED);
+            drawLine(bounds, canvas, Line.line(southeast, northeast), Color.RED);
 
             if (gridZone.getLetter() == MGRSConstants.MIN_BAND_LETTER) {
-                drawLine(webMercatorBounds, canvas, Line.line(Point.degrees(minLon, minLat), Point.degrees(maxLon, minLat)), Color.RED);
+                drawLine(bounds, canvas, Line.line(gridBounds.getSouthwest(), southeast), Color.RED);
             }
 
             if (zoom > 3) {
-                drawName(bitmap, gridZone, webMercatorBounds, canvas);
+                drawName(gridZone, bounds, canvas);
             }
         }
 
@@ -100,8 +107,10 @@ public class GZDGridTileProvider implements TileProvider {
     /**
      * Draw the shape on the canvas
      *
-     * @param bounds
-     * @param canvas
+     * @param bounds tile bounds
+     * @param canvas draw canvas
+     * @param line   line to draw
+     * @param color  color
      */
     private void drawLine(Bounds bounds, Canvas canvas, Line line, int color) {
 
@@ -118,7 +127,14 @@ public class GZDGridTileProvider implements TileProvider {
 
     }
 
-    private void drawName(Bitmap bitmap, GridZone gridZone, Bounds bounds, Canvas canvas) {
+    /**
+     * Draw a grid name
+     *
+     * @param gridZone grid zone
+     * @param bounds   tile bounds
+     * @param canvas   draw canvas
+     */
+    private void drawName(GridZone gridZone, Bounds bounds, Canvas canvas) {
 
         String name = gridZone.getName();
         Log.e("GZD GRID NAME", name);
@@ -134,8 +150,8 @@ public class GZDGridTileProvider implements TileProvider {
 
         // Determine the center of the tile
         Bounds zoneBounds = gridZone.getBounds();
-        Point point = zoneBounds.getCenter().toMeters();
-        Pixel pixel = point.getPixel(tileWidth, tileHeight, bounds);
+        Point center = zoneBounds.getCenter();
+        Pixel pixel = center.getPixel(tileWidth, tileHeight, bounds);
 
         // Draw the text
         canvas.drawText(name, pixel.getX() - textBounds.exactCenterX(),
@@ -145,18 +161,21 @@ public class GZDGridTileProvider implements TileProvider {
     /**
      * Add the polyline to the path
      *
-     * @param bounds
-     * @param path
-     * @param line
+     * @param bounds tile bounds
+     * @param path   path
+     * @param line   line to draw
      */
     private void addPolyline(Bounds bounds, Path path, Line line) {
 
         line = line.toMeters();
 
-        Pixel pixel1 = line.getPoint1().getPixel(tileWidth, tileHeight, bounds);
+        Point point1 = line.getPoint1();
+        Point point2 = line.getPoint2();
+
+        Pixel pixel1 = point1.getPixel(tileWidth, tileHeight, bounds);
         path.moveTo(pixel1.getX(), pixel1.getY());
 
-        Pixel pixel2 = line.getPoint2().getPixel(tileWidth, tileHeight, bounds);
+        Pixel pixel2 = point2.getPixel(tileWidth, tileHeight, bounds);
         path.lineTo(pixel2.getX(), pixel2.getY());
 
     }
