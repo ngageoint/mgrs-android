@@ -14,8 +14,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.app.R;
-import mil.nga.mgrs.gzd.MGRSTileProvider;
-import mil.nga.mgrs.gzd.TileUtils;
+import mil.nga.mgrs.tile.MGRSTileProvider;
+import mil.nga.mgrs.tile.TileUtils;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
@@ -57,6 +57,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onCameraIdle() {
         LatLng center = map.getCameraPosition().target;
         MGRS mgrs = MGRS.from(TileUtils.toPoint(center));
-        mgrsLabel.setText(mgrs.format(4));
+        mgrsLabel.setText(mgrs.toString());
     }
 }

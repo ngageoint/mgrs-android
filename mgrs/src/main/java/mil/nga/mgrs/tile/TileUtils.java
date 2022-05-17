@@ -1,4 +1,4 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.tile;
 
 import android.graphics.Bitmap;
 

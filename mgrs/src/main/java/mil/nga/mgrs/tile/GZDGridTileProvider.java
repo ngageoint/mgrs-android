@@ -1,4 +1,4 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.tile;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,15 +15,18 @@ import com.google.android.gms.maps.model.TileProvider;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.R;
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Pixel;
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.gzd.GridZone;
+import mil.nga.mgrs.gzd.GridZones;
 
 /**
  * GZD Grid Tile Provider
  *
  * @author wnewman
  * @author osbornb
+ * @Deprecated to be replaced by {@link MGRSTileProvider}
  */
 public class GZDGridTileProvider implements TileProvider {
 

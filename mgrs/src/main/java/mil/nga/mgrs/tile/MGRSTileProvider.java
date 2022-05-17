@@ -1,4 +1,4 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.tile;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,20 +9,22 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
 import java.util.List;
 
-import mil.nga.mgrs.Label;
-import mil.nga.mgrs.MGRSTile;
 import mil.nga.mgrs.R;
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Pixel;
-import mil.nga.mgrs.features.PixelRange;
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.grid.Grid;
+import mil.nga.mgrs.grid.Grids;
+import mil.nga.mgrs.gzd.GridRange;
+import mil.nga.mgrs.gzd.GridZone;
+import mil.nga.mgrs.gzd.GridZones;
+import mil.nga.mgrs.gzd.Label;
 
 /**
  * MGRS Tile Provider
@@ -78,7 +80,7 @@ public class MGRSTileProvider implements TileProvider {
             bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
 
-            MGRSTile mgrsTile = new MGRSTile(tileWidth, tileHeight, x, y, zoom);
+            MGRSTile mgrsTile = MGRSTile.create(tileWidth, tileHeight, x, y, zoom);
             Bounds bounds = mgrsTile.getBounds().toDegrees();
 
             GridRange gridRange = GridZones.getGridRange(bounds);
@@ -93,12 +95,12 @@ public class MGRSTileProvider implements TileProvider {
 
                     if (grid == Grid.GZD && zoom > 3) {
                         List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
-                        drawLabels(labels, mgrsTile, zone, canvas);
+                        drawLabels(labels, mgrsTile, canvas);
                     }
 
                     if (grid == Grid.HUNDRED_KILOMETER && zoom > 5) {
                         List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
-                        drawLabels(labels, mgrsTile, zone, canvas);
+                        drawLabels(labels, mgrsTile, canvas);
                     }
                 }
             }
@@ -127,10 +129,9 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param labels labels to draw
      * @param tile   tile
-     * @param zone   gris zone
      * @param canvas draw canvas
      */
-    private void drawLabels(List<Label> labels, MGRSTile tile, GridZone zone, Canvas canvas) {
+    private void drawLabels(List<Label> labels, MGRSTile tile, Canvas canvas) {
         for (Label label : labels) {
             drawLabel(label, tile, canvas);
         }
@@ -195,23 +196,22 @@ public class MGRSTileProvider implements TileProvider {
     private void drawLabel(Label label, MGRSTile tile, Canvas canvas) {
 
         // TODO grid based paint
-        Paint oneHundredKLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        oneHundredKLabelPaint.setColor(Color.rgb(76, 175, 80));
-        oneHundredKLabelPaint.setTextSize(24);
-        oneHundredKLabelPaint.setTypeface(Typeface.MONOSPACE);
+        Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        labelPaint.setColor(Color.rgb(76, 175, 80));
+        labelPaint.setTextSize(24);
+        labelPaint.setTypeface(Typeface.MONOSPACE);
+
+        String name = label.getName();
+        int nameLength = name.length();
 
         // Determine the text bounds
         Rect textBounds = new Rect();
-        oneHundredKLabelPaint.getTextBounds(label.getName(), 0, label.getName().length(), textBounds);
+        labelPaint.getTextBounds(name, 0, nameLength, textBounds);
 
         Point center = label.getCenter();
         Pixel centerPixel = center.getPixel(tile);
 
-        if (label.getName().equals("KV") || label.getName().equals("GE")) {
-            Log.i("", "");
-        }
-
-        float textWidth = oneHundredKLabelPaint.measureText(label.getName(), 0, label.getName().length());
+        float textWidth = labelPaint.measureText(name, 0, nameLength);
 
         PixelRange pixelRange = label.getBounds().getPixelRange(tile);
         float zoneWidth = pixelRange.getWidth();
@@ -221,7 +221,7 @@ public class MGRSTileProvider implements TileProvider {
         double textHeightPercent = textBounds.height() * 2 / zoneHeight;
 
         if (textWidthPercent < .80 && textHeightPercent < .80 && textBounds.width() < zoneWidth && textBounds.height() < zoneHeight) {
-            canvas.drawText(label.getName(), centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), oneHundredKLabelPaint);
+            canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
         }
     }
 
