@@ -21,11 +21,11 @@ import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.Grid;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Grids;
+import mil.nga.mgrs.grid.Label;
 import mil.nga.mgrs.grid.ZoomGrids;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
-import mil.nga.mgrs.gzd.Label;
 
 /**
  * MGRS Tile Provider
@@ -229,27 +229,22 @@ public class MGRSTileProvider implements TileProvider {
             Canvas canvas = new Canvas(bitmap);
 
             MGRSTile mgrsTile = MGRSTile.create(tileWidth, tileHeight, x, y, zoom);
-            Bounds bounds = mgrsTile.getBounds().toDegrees();
 
-            GridRange gridRange = GridZones.getGridRange(bounds);
+            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBounds());
 
             for (Grid grid : zoomGrids) {
 
                 // draw this grid for each zone
                 for (GridZone zone : gridRange) {
 
-                    List<Line> lines = zone.getLines(bounds, grid.getPrecision());
+                    List<Line> lines = grid.getLines(mgrsTile, zone);
                     drawLines(lines, mgrsTile, zone, canvas);
 
-                    if (grid.isType(GridType.GZD) && zoom > 3) {
-                        List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
+                    List<Label> labels = grid.getLabels(mgrsTile, zone);
+                    if (labels != null) {
                         drawLabels(labels, mgrsTile, canvas);
                     }
 
-                    if (grid.isType(GridType.HUNDRED_KILOMETER) && zoom > 5) {
-                        List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
-                        drawLabels(labels, mgrsTile, canvas);
-                    }
                 }
             }
         }

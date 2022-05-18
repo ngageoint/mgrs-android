@@ -58,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int tileWidth = getResources().getInteger(R.integer.tile_width);
         int tileHeight = getResources().getInteger(R.integer.tile_height);
 
-        MGRSTileProvider tileProvider = MGRSTileProvider.createGZD(tileWidth, tileHeight);
+        MGRSTileProvider tileProvider = MGRSTileProvider.create(tileWidth, tileHeight);
 
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 
