@@ -1,6 +1,7 @@
 package mil.nga.mgrs.tile;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Tile;
@@ -37,6 +38,8 @@ public class TileUtils {
                 try {
                     byteStream.close();
                 } catch (IOException e) {
+                    Log.w(TileUtils.class.getSimpleName(),
+                            "Failed to close bitmap compression byte stream", e);
                 }
             }
         }

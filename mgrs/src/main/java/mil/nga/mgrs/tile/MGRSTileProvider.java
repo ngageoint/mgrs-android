@@ -1,6 +1,5 @@
 package mil.nga.mgrs.tile;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,14 +12,16 @@ import android.graphics.Typeface;
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
+import java.util.Collection;
 import java.util.List;
 
-import mil.nga.mgrs.R;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.Grid;
+import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Grids;
+import mil.nga.mgrs.grid.ZoomGrids;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
@@ -45,13 +46,160 @@ public class MGRSTileProvider implements TileProvider {
     private int tileHeight;
 
     /**
+     * Grids
+     */
+    private Grids grids;
+
+    /**
+     * Create a tile provider with all grids
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     */
+    public static MGRSTileProvider create(int tileWidth, int tileHeight) {
+        return new MGRSTileProvider(tileWidth, tileHeight);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param types      grids types to enable
+     */
+    public static MGRSTileProvider create(int tileWidth, int tileHeight, GridType... types) {
+        return new MGRSTileProvider(tileWidth, tileHeight, types);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param types      grids types to enable
+     */
+    public static MGRSTileProvider create(int tileWidth, int tileHeight, Collection<GridType> types) {
+        return new MGRSTileProvider(tileWidth, tileHeight, types);
+    }
+
+    /**
+     * Create a tile provider with grids
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param grids      grids
+     */
+    public static MGRSTileProvider create(int tileWidth, int tileHeight, Grids grids) {
+        return new MGRSTileProvider(tileWidth, tileHeight, grids);
+    }
+
+    /**
+     * Create a tile provider with Grid Zone Designator grids
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     */
+    public static MGRSTileProvider createGZD(int tileWidth, int tileHeight) {
+        return new MGRSTileProvider(tileWidth, tileHeight, Grids.createGZD());
+    }
+
+    /**
      * Constructor
      *
-     * @param context context
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
      */
-    public MGRSTileProvider(Context context) {
-        tileWidth = context.getResources().getInteger(R.integer.tile_width);
-        tileHeight = context.getResources().getInteger(R.integer.tile_height);
+    public MGRSTileProvider(int tileWidth, int tileHeight) {
+        this(tileWidth, tileHeight, Grids.create());
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param types      grids types to enable
+     */
+    public MGRSTileProvider(int tileWidth, int tileHeight, GridType... types) {
+        this(tileWidth, tileHeight, Grids.create(types));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param types      grids types to enable
+     */
+    public MGRSTileProvider(int tileWidth, int tileHeight, Collection<GridType> types) {
+        this(tileWidth, tileHeight, Grids.create(types));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param grids      grids
+     */
+    public MGRSTileProvider(int tileWidth, int tileHeight, Grids grids) {
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        this.grids = grids;
+    }
+
+    /**
+     * Get the tile width
+     *
+     * @return tile width
+     */
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    /**
+     * Set the tile width
+     *
+     * @param tileWidth tile width
+     */
+    public void setTileWidth(int tileWidth) {
+        this.tileWidth = tileWidth;
+    }
+
+    /**
+     * Get the tile height
+     *
+     * @return tile height
+     */
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    /**
+     * Set the tile height
+     *
+     * @param tileHeight tile height
+     */
+    public void setTileHeight(int tileHeight) {
+        this.tileHeight = tileHeight;
+    }
+
+    /**
+     * Get the grids
+     *
+     * @return grids
+     */
+    public Grids getGrids() {
+        return grids;
+    }
+
+    /**
+     * Set the grids
+     *
+     * @param grids grids
+     */
+    public void setGrids(Grids grids) {
+        this.grids = grids;
     }
 
     /**
@@ -74,8 +222,8 @@ public class MGRSTileProvider implements TileProvider {
     private Bitmap drawTile(int x, int y, int zoom) {
         Bitmap bitmap = null;
 
-        Grids grids = Grid.getGrids(zoom);
-        if (grids.hasGrids()) {
+        ZoomGrids zoomGrids = grids.getGrids(zoom);
+        if (zoomGrids.hasGrids()) {
 
             bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
@@ -85,7 +233,7 @@ public class MGRSTileProvider implements TileProvider {
 
             GridRange gridRange = GridZones.getGridRange(bounds);
 
-            for (Grid grid : grids) {
+            for (Grid grid : zoomGrids) {
 
                 // draw this grid for each zone
                 for (GridZone zone : gridRange) {
@@ -93,12 +241,12 @@ public class MGRSTileProvider implements TileProvider {
                     List<Line> lines = zone.getLines(bounds, grid.getPrecision());
                     drawLines(lines, mgrsTile, zone, canvas);
 
-                    if (grid == Grid.GZD && zoom > 3) {
+                    if (grid.isType(GridType.GZD) && zoom > 3) {
                         List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
                         drawLabels(labels, mgrsTile, canvas);
                     }
 
-                    if (grid == Grid.HUNDRED_KILOMETER && zoom > 5) {
+                    if (grid.isType(GridType.HUNDRED_KILOMETER) && zoom > 5) {
                         List<Label> labels = zone.getLabels(bounds, grid.getPrecision());
                         drawLabels(labels, mgrsTile, canvas);
                     }
