@@ -354,18 +354,8 @@ public class MGRSTileProvider implements TileProvider {
         Point center = label.getCenter();
         Pixel centerPixel = center.getPixel(tile);
 
-        float textWidth = labelPaint.measureText(name, 0, nameLength);
+        canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
 
-        PixelRange pixelRange = label.getBounds().getPixelRange(tile);
-        float zoneWidth = pixelRange.getWidth();
-        float zoneHeight = pixelRange.getHeight();
-
-        double textWidthPercent = textWidth * 2 / zoneWidth;
-        double textHeightPercent = textBounds.height() * 2 / zoneHeight;
-
-        if (textWidthPercent < .80 && textHeightPercent < .80 && textBounds.width() < zoneWidth && textBounds.height() < zoneHeight) {
-            canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
-        }
     }
 
 }
