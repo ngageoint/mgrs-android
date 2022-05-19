@@ -345,16 +345,18 @@ public class MGRSTileProvider implements TileProvider {
         labelPaint.setTypeface(Typeface.MONOSPACE);
 
         String name = label.getName();
-        int nameLength = name.length();
 
         // Determine the text bounds
         Rect textBounds = new Rect();
-        labelPaint.getTextBounds(name, 0, nameLength, textBounds);
+        labelPaint.getTextBounds(name, 0, name.length(), textBounds);
+        float textWidth = labelPaint.measureText(name);
 
-        Point center = label.getCenter();
-        Pixel centerPixel = center.getPixel(tile);
+        Pixel centerPixel = label.getCenter().getPixel(tile);
+        PixelRange pixelRange = label.getBounds().getPixelRange(tile);
 
-        canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
+        if (textWidth < pixelRange.getWidth() && textBounds.height() < pixelRange.getHeight()) {
+            canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
+        }
 
     }
 
