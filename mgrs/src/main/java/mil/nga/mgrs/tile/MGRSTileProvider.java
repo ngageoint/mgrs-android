@@ -242,7 +242,7 @@ public class MGRSTileProvider implements TileProvider {
 
                     List<Label> labels = grid.getLabels(mgrsTile, zone);
                     if (labels != null) {
-                        drawLabels(labels, mgrsTile, canvas);
+                        drawLabels(labels, grid.getLabelBuffer(), mgrsTile, canvas);
                     }
 
                 }
@@ -271,12 +271,13 @@ public class MGRSTileProvider implements TileProvider {
      * Draw the labels on the tile
      *
      * @param labels labels to draw
+     * @param buffer grid zone edge buffer
      * @param tile   tile
      * @param canvas draw canvas
      */
-    private void drawLabels(List<Label> labels, MGRSTile tile, Canvas canvas) {
+    private void drawLabels(List<Label> labels, double buffer, MGRSTile tile, Canvas canvas) {
         for (Label label : labels) {
-            drawLabel(label, tile, canvas);
+            drawLabel(label, buffer, tile, canvas);
         }
     }
 
@@ -333,10 +334,11 @@ public class MGRSTileProvider implements TileProvider {
      * Draw the label
      *
      * @param label  label to draw
+     * @param buffer grid zone edge buffer
      * @param tile   tile
      * @param canvas draw canvas
      */
-    private void drawLabel(Label label, MGRSTile tile, Canvas canvas) {
+    private void drawLabel(Label label, double buffer, MGRSTile tile, Canvas canvas) {
 
         // TODO grid based paint
         Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -350,11 +352,19 @@ public class MGRSTileProvider implements TileProvider {
         Rect textBounds = new Rect();
         labelPaint.getTextBounds(name, 0, name.length(), textBounds);
         float textWidth = labelPaint.measureText(name);
+        int textHeight = textBounds.height();
 
-        Pixel centerPixel = label.getCenter().getPixel(tile);
+        // Determine the pixel width and height of the label grid zone to the tile
         PixelRange pixelRange = label.getBounds().getPixelRange(tile);
 
-        if (textWidth < pixelRange.getWidth() && textBounds.height() < pixelRange.getHeight()) {
+        // Determine the maximum width and height a label in the grid should be
+        double gridPercentage = 1.0 - (2 * buffer);
+        double maxWidth = gridPercentage * pixelRange.getWidth();
+        double maxHeight = gridPercentage * pixelRange.getHeight();
+
+        // If it fits, draw the label in the center of the grid zone
+        if (textWidth <= maxWidth && textHeight <= maxHeight) {
+            Pixel centerPixel = label.getCenter().getPixel(tile);
             canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), labelPaint);
         }
 
