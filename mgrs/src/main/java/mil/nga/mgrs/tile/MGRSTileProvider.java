@@ -2,7 +2,6 @@ package mil.nga.mgrs.tile;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -22,6 +21,7 @@ import mil.nga.mgrs.grid.Grid;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Grids;
 import mil.nga.mgrs.grid.Label;
+import mil.nga.mgrs.grid.Labeler;
 import mil.nga.mgrs.grid.ZoomGrids;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
@@ -238,11 +238,11 @@ public class MGRSTileProvider implements TileProvider {
                 for (GridZone zone : gridRange) {
 
                     List<Line> lines = grid.getLines(mgrsTile, zone);
-                    drawLines(lines, mgrsTile, zone, canvas);
+                    drawLines(grid, lines, mgrsTile, zone, canvas);
 
                     List<Label> labels = grid.getLabels(mgrsTile, zone);
                     if (labels != null) {
-                        drawLabels(labels, grid.getLabelBuffer(), mgrsTile, canvas);
+                        drawLabels(grid, labels, grid.getLabelBuffer(), mgrsTile, canvas);
                     }
 
                 }
@@ -255,49 +255,52 @@ public class MGRSTileProvider implements TileProvider {
     /**
      * Draw the lines on the tile
      *
+     * @param grid   grid
      * @param lines  lines to draw
      * @param tile   tile
      * @param zone   grid zone
      * @param canvas draw canvas
      */
-    private void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas) {
+    private void drawLines(Grid grid, List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas) {
         Bounds zoneBounds = zone.getBounds().toMeters();
         for (Line line : lines) {
-            drawLine(line, tile, zoneBounds, canvas);
+            drawLine(grid, line, tile, zoneBounds, canvas);
         }
     }
 
     /**
      * Draw the labels on the tile
      *
+     * @param grid   grid
      * @param labels labels to draw
      * @param buffer grid zone edge buffer
      * @param tile   tile
      * @param canvas draw canvas
      */
-    private void drawLabels(List<Label> labels, double buffer, MGRSTile tile, Canvas canvas) {
+    private void drawLabels(Grid grid, List<Label> labels, double buffer, MGRSTile tile, Canvas canvas) {
         for (Label label : labels) {
-            drawLabel(label, buffer, tile, canvas);
+            drawLabel(grid, label, buffer, tile, canvas);
         }
     }
 
     /**
      * Draw the shape on the canvas
      *
+     * @param grid       grid
      * @param line       line to draw
      * @param tile       tile
      * @param zoneBounds grid zone bounds
      * @param canvas     draw canvas
      */
-    private void drawLine(Line line, MGRSTile tile, Bounds zoneBounds, Canvas canvas) {
+    private void drawLine(Grid grid, Line line, MGRSTile tile, Bounds zoneBounds, Canvas canvas) {
         canvas.save();
 
         // TODO grid based paint
         Paint linePaint = new Paint();
         linePaint.setAntiAlias(true);
-        linePaint.setStrokeWidth(2);
+        linePaint.setStrokeWidth((float) grid.getWidth());
         linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setColor(Color.rgb(239, 83, 80));
+        linePaint.setColor(grid.getColor().getColorWithAlpha());
 
         PixelRange pixelRange = zoneBounds.getPixelRange(tile);
         canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
@@ -333,17 +336,19 @@ public class MGRSTileProvider implements TileProvider {
     /**
      * Draw the label
      *
+     * @param grid   grid
      * @param label  label to draw
      * @param buffer grid zone edge buffer
      * @param tile   tile
      * @param canvas draw canvas
      */
-    private void drawLabel(Label label, double buffer, MGRSTile tile, Canvas canvas) {
+    private void drawLabel(Grid grid, Label label, double buffer, MGRSTile tile, Canvas canvas) {
 
         // TODO grid based paint
+        Labeler labeler = grid.getLabeler();
         Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        labelPaint.setColor(Color.rgb(76, 175, 80));
-        labelPaint.setTextSize(24);
+        labelPaint.setColor(labeler.getColor().getColorWithAlpha());
+        labelPaint.setTextSize((float) labeler.getTextSize());
         labelPaint.setTypeface(Typeface.MONOSPACE);
 
         String name = label.getName();
