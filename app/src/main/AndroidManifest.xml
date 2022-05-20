@@ -14,15 +14,14 @@
             android:value="@string/GOOGLE_MAPS_ANDROID_API_KEY" />
 
         <activity
-            android:name="mil.nga.giat.app.MapsActivity"
-            android:label="@string/title_activity_maps"
+            android:name=".MapsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

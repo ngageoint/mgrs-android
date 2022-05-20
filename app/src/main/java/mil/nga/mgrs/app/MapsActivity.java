@@ -1,4 +1,4 @@
-package mil.nga.giat.app;
+package mil.nga.mgrs.app;
 
 import android.os.Bundle;
 import android.widget.TextView;
@@ -15,7 +15,6 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import mil.nga.mgrs.app.R;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
 /**
