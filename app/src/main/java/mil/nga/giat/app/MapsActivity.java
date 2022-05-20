@@ -15,22 +15,50 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.app.R;
 import mil.nga.mgrs.tile.MGRSTileProvider;
-import mil.nga.mgrs.tile.TileUtils;
 
+/**
+ * MGRS Example Application
+ *
+ * @author wnewman
+ * @author osbornb
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
+    /**
+     * Google map
+     */
     private GoogleMap map;
+
+    /**
+     * MGRS label
+     */
     private TextView mgrsLabel;
+
+    /**
+     * Zoom label
+     */
     private TextView zoomLabel;
+
+    /**
+     * Zoom level label formatter
+     */
     private DecimalFormat zoomFormatter = new DecimalFormat("0.0");
 
+    /**
+     * MGRS tile provider
+     */
+    private MGRSTileProvider tileProvider = null;
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -38,39 +66,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mgrsLabel = (TextView) findViewById(R.id.mgrs);
         zoomLabel = (TextView) findViewById(R.id.zoom);
         zoomFormatter.setRoundingMode(RoundingMode.DOWN);
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         int tileWidth = getResources().getInteger(R.integer.tile_width);
         int tileHeight = getResources().getInteger(R.integer.tile_height);
 
-        MGRSTileProvider tileProvider = MGRSTileProvider.create(tileWidth, tileHeight);
+        tileProvider = MGRSTileProvider.create(tileWidth, tileHeight);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
-
         map.setOnCameraIdleListener(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCameraIdle() {
         CameraPosition cameraPosition = map.getCameraPosition();
         LatLng center = cameraPosition.target;
-        MGRS mgrs = MGRS.from(TileUtils.toPoint(center));
-        mgrsLabel.setText(mgrs.toString());
-        zoomLabel.setText(zoomFormatter.format(cameraPosition.zoom));
+        float zoom = cameraPosition.zoom;
+        mgrsLabel.setText(tileProvider.getCoordinate(center, (int) zoom));
+        zoomLabel.setText(zoomFormatter.format(zoom));
     }
+
 }
