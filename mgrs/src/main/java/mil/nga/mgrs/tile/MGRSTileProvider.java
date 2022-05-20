@@ -8,12 +8,14 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
 import java.util.Collection;
 import java.util.List;
 
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
@@ -200,6 +202,51 @@ public class MGRSTileProvider implements TileProvider {
      */
     public void setGrids(Grids grids) {
         this.grids = grids;
+    }
+
+    /**
+     * Get the Military Grid Reference System coordinate for the location in one
+     * meter precision
+     *
+     * @param latLng location
+     * @return MGRS coordinate
+     */
+    public String getCoordinate(LatLng latLng) {
+        return grids.getCoordinate(TileUtils.toPoint(latLng));
+    }
+
+    /**
+     * Get the Military Grid Reference System coordinate for the location in the
+     * zoom level precision
+     *
+     * @param latLng location
+     * @param zoom   zoom level precision
+     * @return MGRS coordinate
+     */
+    public String getCoordinate(LatLng latLng, int zoom) {
+        return grids.getCoordinate(TileUtils.toPoint(latLng), zoom);
+    }
+
+    /**
+     * Get the Military Grid Reference System coordinate for the location in the
+     * grid type precision
+     *
+     * @param latLng location
+     * @param type   grid type precision
+     * @return MGRS coordinate
+     */
+    public String getCoordinate(LatLng latLng, GridType type) {
+        return grids.getCoordinate(TileUtils.toPoint(latLng), type);
+    }
+
+    /**
+     * Get the Military Grid Reference System for the location
+     *
+     * @param latLng location
+     * @return MGRS
+     */
+    public MGRS getMGRS(LatLng latLng) {
+        return grids.getMGRS(TileUtils.toPoint(latLng));
     }
 
     /**
