@@ -1,31 +1,16 @@
 package mil.nga.mgrs.tile;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.Region;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
 import java.util.Collection;
-import java.util.List;
 
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
-import mil.nga.mgrs.grid.Label;
-import mil.nga.mgrs.grid.style.Grid;
 import mil.nga.mgrs.grid.style.Grids;
-import mil.nga.mgrs.grid.style.ZoomGrids;
-import mil.nga.mgrs.gzd.GridRange;
-import mil.nga.mgrs.gzd.GridZone;
-import mil.nga.mgrs.gzd.GridZones;
 
 /**
  * MGRS Tile Provider
@@ -252,8 +237,7 @@ public class MGRSTileProvider implements TileProvider {
      */
     @Override
     public Tile getTile(int x, int y, int zoom) {
-        Bitmap bitmap = drawTile(x, y, zoom);
-        return TileUtils.toTile(bitmap);
+        return TileUtils.toTile(drawTile(x, y, zoom));
     }
 
     /**
@@ -265,147 +249,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return bitmap
      */
     private Bitmap drawTile(int x, int y, int zoom) {
-        Bitmap bitmap = null;
-
-        ZoomGrids zoomGrids = grids.getGrids(zoom);
-        if (zoomGrids.hasGrids()) {
-
-            bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-
-            MGRSTile mgrsTile = MGRSTile.create(tileWidth, tileHeight, x, y, zoom);
-
-            GridRange gridRange = GridZones.getGridRange(mgrsTile.getBounds());
-
-            for (Grid grid : zoomGrids.grids()) {
-
-                Paint linePaint = grid.getLinePaint();
-                Paint labelPaint = grid.getLabelPaint();
-
-                // draw this grid for each zone
-                for (GridZone zone : gridRange) {
-
-                    List<Line> lines = grid.getLines(mgrsTile, zone);
-                    drawLines(lines, mgrsTile, zone, canvas, linePaint);
-
-                    List<Label> labels = grid.getLabels(mgrsTile, zone);
-                    if (labels != null) {
-                        drawLabels(labels, grid.getLabelBuffer(), mgrsTile, canvas, labelPaint);
-                    }
-
-                }
-            }
-        }
-
-        return bitmap;
-    }
-
-    /**
-     * Draw the lines on the tile
-     *
-     * @param lines  lines to draw
-     * @param tile   tile
-     * @param zone   grid zone
-     * @param canvas draw canvas
-     */
-    private void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas, Paint paint) {
-        Bounds zoneBounds = zone.getBounds().toMeters();
-        for (Line line : lines) {
-            drawLine(line, tile, zoneBounds, canvas, paint);
-        }
-    }
-
-    /**
-     * Draw the labels on the tile
-     *
-     * @param labels labels to draw
-     * @param buffer grid zone edge buffer
-     * @param tile   tile
-     * @param canvas draw canvas
-     * @param paint  label paint
-     */
-    private void drawLabels(List<Label> labels, double buffer, MGRSTile tile, Canvas canvas, Paint paint) {
-        for (Label label : labels) {
-            drawLabel(label, buffer, tile, canvas, paint);
-        }
-    }
-
-    /**
-     * Draw the shape on the canvas
-     *
-     * @param line       line to draw
-     * @param tile       tile
-     * @param zoneBounds grid zone bounds
-     * @param canvas     draw canvas
-     * @param paint      line paint
-     */
-    private void drawLine(Line line, MGRSTile tile, Bounds zoneBounds, Canvas canvas, Paint paint) {
-        canvas.save();
-
-        PixelRange pixelRange = zoneBounds.getPixelRange(tile);
-        canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
-
-        Path linePath = new Path();
-        addPolyline(tile, linePath, line);
-        canvas.drawPath(linePath, paint);
-
-        canvas.restore();
-    }
-
-    /**
-     * Add the polyline to the path
-     *
-     * @param tile tile
-     * @param path line path
-     * @param line line to draw
-     */
-    private void addPolyline(MGRSTile tile, Path path, Line line) {
-
-        line = line.toMeters();
-        Point point1 = line.getPoint1();
-        Point point2 = line.getPoint2();
-
-        Pixel pixel = point1.getPixel(tile);
-        path.moveTo(pixel.getX(), pixel.getY());
-
-        Pixel pixel2 = point2.getPixel(tile);
-        path.lineTo(pixel2.getX(), pixel2.getY());
-
-    }
-
-    /**
-     * Draw the label
-     *
-     * @param label  label to draw
-     * @param buffer grid zone edge buffer
-     * @param tile   tile
-     * @param canvas draw canvas
-     * @param paint  label paint
-     */
-    private void drawLabel(Label label, double buffer, MGRSTile tile, Canvas canvas, Paint paint) {
-
-        String name = label.getName();
-
-        // Determine the text bounds
-        Rect textBounds = new Rect();
-        paint.getTextBounds(name, 0, name.length(), textBounds);
-        float textWidth = paint.measureText(name);
-        int textHeight = textBounds.height();
-
-        // Determine the pixel width and height of the label grid zone to the tile
-        PixelRange pixelRange = label.getBounds().getPixelRange(tile);
-
-        // Determine the maximum width and height a label in the grid should be
-        double gridPercentage = 1.0 - (2 * buffer);
-        double maxWidth = gridPercentage * pixelRange.getWidth();
-        double maxHeight = gridPercentage * pixelRange.getHeight();
-
-        // If it fits, draw the label in the center of the grid zone
-        if (textWidth <= maxWidth && textHeight <= maxHeight) {
-            Pixel centerPixel = label.getCenter().getPixel(tile);
-            canvas.drawText(name, centerPixel.getX() - textBounds.exactCenterX(), centerPixel.getY() - textBounds.exactCenterY(), paint);
-        }
-
+        return grids.drawTile(tileWidth, tileHeight, x, y, zoom);
     }
 
 }
