@@ -134,6 +134,7 @@ public class TileUtils {
                             "Failed to close bitmap compression byte stream", e);
                 }
             }
+            bitmap.recycle();
         }
 
         return bytes;
