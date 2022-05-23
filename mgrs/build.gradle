@@ -8,6 +8,7 @@ version = "1.0.0"
 
 android {
     compileSdkVersion 32
+    namespace 'mil.nga.mgrs'
 
     defaultConfig {
         minSdkVersion 19

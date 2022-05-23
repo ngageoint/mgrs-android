@@ -5,6 +5,7 @@ def googleMapsApiKeyDebug = hasProperty('DEBUG_MAPS_API_KEY') ? DEBUG_MAPS_API_K
 
 android {
     compileSdkVersion 32
+    namespace 'mil.nga.mgrs.app'
 
     defaultConfig {
         minSdkVersion 19
@@ -27,6 +28,7 @@ android {
             resValue "string", "GOOGLE_MAPS_ANDROID_API_KEY", googleMapsApiKeyDebug
         }
     }
+
 }
 
 dependencies {
