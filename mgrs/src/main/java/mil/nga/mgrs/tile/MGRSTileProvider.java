@@ -1,5 +1,6 @@
 package mil.nga.mgrs.tile;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -34,6 +35,84 @@ public class MGRSTileProvider implements TileProvider {
      * Grids
      */
     private Grids grids;
+
+    /**
+     * Create a tile provider with all grids
+     *
+     * @param context app context
+     */
+    public static MGRSTileProvider create(Context context) {
+        return new MGRSTileProvider(context);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param context app context
+     * @param types   grids types to enable
+     */
+    public static MGRSTileProvider create(Context context, GridType... types) {
+        return new MGRSTileProvider(context, types);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param context app context
+     * @param types   grids types to enable
+     */
+    public static MGRSTileProvider create(Context context, Collection<GridType> types) {
+        return new MGRSTileProvider(context, types);
+    }
+
+    /**
+     * Create a tile provider with grids
+     *
+     * @param context app context
+     * @param grids   grids
+     */
+    public static MGRSTileProvider create(Context context, Grids grids) {
+        return new MGRSTileProvider(context, grids);
+    }
+
+    /**
+     * Create a tile provider with all grids
+     *
+     * @param tileLength tile width and height
+     */
+    public static MGRSTileProvider create(int tileLength) {
+        return new MGRSTileProvider(tileLength);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param tileLength tile width and height
+     * @param types      grids types to enable
+     */
+    public static MGRSTileProvider create(int tileLength, GridType... types) {
+        return new MGRSTileProvider(tileLength, types);
+    }
+
+    /**
+     * Create a tile provider with grid types
+     *
+     * @param tileLength tile width and height
+     * @param types      grids types to enable
+     */
+    public static MGRSTileProvider create(int tileLength, Collection<GridType> types) {
+        return new MGRSTileProvider(tileLength, types);
+    }
+
+    /**
+     * Create a tile provider with grids
+     *
+     * @param tileLength tile width and height
+     * @param grids      grids
+     */
+    public static MGRSTileProvider create(int tileLength, Grids grids) {
+        return new MGRSTileProvider(tileLength, grids);
+    }
 
     /**
      * Create a tile provider with all grids
@@ -81,11 +160,107 @@ public class MGRSTileProvider implements TileProvider {
     /**
      * Create a tile provider with Grid Zone Designator grids
      *
+     * @param context app context
+     */
+    public static MGRSTileProvider createGZD(Context context) {
+        return createGZD(TileUtils.tileLength(context));
+    }
+
+    /**
+     * Create a tile provider with Grid Zone Designator grids
+     *
+     * @param tileLength tile length
+     */
+    public static MGRSTileProvider createGZD(int tileLength) {
+        return createGZD(tileLength, tileLength);
+    }
+
+    /**
+     * Create a tile provider with Grid Zone Designator grids
+     *
      * @param tileWidth  tile width
      * @param tileHeight tile height
      */
     public static MGRSTileProvider createGZD(int tileWidth, int tileHeight) {
         return new MGRSTileProvider(tileWidth, tileHeight, Grids.createGZD());
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context app context
+     */
+    public MGRSTileProvider(Context context) {
+        this(TileUtils.tileLength(context));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context app context
+     * @param types   grids types to enable
+     */
+    public MGRSTileProvider(Context context, GridType... types) {
+        this(TileUtils.tileLength(context), types);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context app context
+     * @param types   grids types to enable
+     */
+    public MGRSTileProvider(Context context, Collection<GridType> types) {
+        this(TileUtils.tileLength(context), types);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context app context
+     * @param grids   grids
+     */
+    public MGRSTileProvider(Context context, Grids grids) {
+        this(TileUtils.tileLength(context), grids);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileLength tile width and height
+     */
+    public MGRSTileProvider(int tileLength) {
+        this(tileLength, tileLength);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileLength tile width and height
+     * @param types      grids types to enable
+     */
+    public MGRSTileProvider(int tileLength, GridType... types) {
+        this(tileLength, tileLength, types);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileLength tile width and height
+     * @param types      grids types to enable
+     */
+    public MGRSTileProvider(int tileLength, Collection<GridType> types) {
+        this(tileLength, tileLength, types);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tileLength tile width and height
+     * @param grids      grids
+     */
+    public MGRSTileProvider(int tileLength, Grids grids) {
+        this(tileLength, tileLength, grids);
     }
 
     /**

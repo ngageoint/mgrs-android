@@ -66,10 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         zoomLabel = (TextView) findViewById(R.id.zoom);
         zoomFormatter.setRoundingMode(RoundingMode.DOWN);
 
-        int tileWidth = getResources().getInteger(R.integer.tile_width);
-        int tileHeight = getResources().getInteger(R.integer.tile_height);
-
-        tileProvider = MGRSTileProvider.create(tileWidth, tileHeight);
+        tileProvider = MGRSTileProvider.create(this);
     }
 
     /**
