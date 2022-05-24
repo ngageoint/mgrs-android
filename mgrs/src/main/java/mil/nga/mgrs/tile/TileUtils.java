@@ -134,7 +134,6 @@ public class TileUtils {
                             "Failed to close bitmap compression byte stream", e);
                 }
             }
-            bitmap.recycle();
         }
 
         return bytes;
@@ -150,10 +149,15 @@ public class TileUtils {
 
         Tile tile = null;
 
-        byte[] bytes = toBytes(bitmap);
+        if (bitmap != null) {
 
-        if (bytes != null) {
-            tile = new Tile(bitmap.getWidth(), bitmap.getHeight(), bytes);
+            byte[] bytes = toBytes(bitmap);
+
+            if (bytes != null) {
+                tile = new Tile(bitmap.getWidth(), bitmap.getHeight(), bytes);
+            }
+
+            bitmap.recycle();
         }
 
         return tile;
