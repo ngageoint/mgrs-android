@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
 /**
@@ -36,9 +37,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView mgrsLabel;
 
     /**
+     * WGS84 coordinate label
+     */
+    private TextView wgs84Label;
+
+    /**
      * Zoom label
      */
     private TextView zoomLabel;
+
+    /**
+     * Coordinate label formatter
+     */
+    private DecimalFormat coordinateFormatter = new DecimalFormat("0.#####");
 
     /**
      * Zoom level label formatter
@@ -63,6 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         mgrsLabel = (TextView) findViewById(R.id.mgrs);
+        wgs84Label = (TextView) findViewById(R.id.wgs84);
         zoomLabel = (TextView) findViewById(R.id.zoom);
         zoomFormatter.setRoundingMode(RoundingMode.DOWN);
 
@@ -89,6 +101,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng center = cameraPosition.target;
         float zoom = cameraPosition.zoom;
         mgrsLabel.setText(tileProvider.getCoordinate(center, (int) zoom));
+        wgs84Label.setText(coordinateFormatter.format(center.longitude)
+                + "," + coordinateFormatter.format(center.latitude));
         zoomLabel.setText(zoomFormatter.format(zoom));
     }
 

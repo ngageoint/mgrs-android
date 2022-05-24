@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -24,12 +25,12 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:alpha=".25"
-            android:tint="#FF0000"/>
+            app:tint="#FF0000" />
 
     </RelativeLayout>
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="45dip">
 
@@ -37,16 +38,24 @@
             android:id="@+id/mgrs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:text="MGRS"/>
 
         <TextView
-            android:id="@+id/zoom"
-            android:layout_width="match_parent"
+            android:id="@+id/wgs84"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right"
+            android:layout_centerHorizontal="true"
+            android:text="Coordinate" />
+
+        <TextView
+            android:id="@+id/zoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:text="Zoom Level" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
 
