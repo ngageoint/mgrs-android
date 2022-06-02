@@ -189,7 +189,9 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
             for (GridZone zone : gridRange) {
 
                 List<Line> lines = grid.getLines(mgrsTile, zone);
-                TileDraw.drawLines(lines, mgrsTile, zone, canvas, linePaint);
+                if (lines != null) {
+                    TileDraw.drawLines(lines, mgrsTile, zone, canvas, linePaint);
+                }
 
                 List<Label> labels = grid.getLabels(mgrsTile, zone);
                 if (labels != null) {
