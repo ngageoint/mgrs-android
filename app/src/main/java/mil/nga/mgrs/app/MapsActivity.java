@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -15,7 +16,6 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
 /**
@@ -24,7 +24,7 @@ import mil.nga.mgrs.tile.MGRSTileProvider;
  * @author wnewman
  * @author osbornb
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener {
 
     /**
      * Google map
@@ -91,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.getUiSettings().setZoomControlsEnabled(true);
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
         map.setOnCameraIdleListener(this);
+        map.setOnMapClickListener(this);
     }
 
     /**
@@ -105,6 +106,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wgs84Label.setText(coordinateFormatter.format(center.longitude)
                 + "," + coordinateFormatter.format(center.latitude));
         zoomLabel.setText(zoomFormatter.format(zoom));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onMapClick(LatLng latLng) {
+        map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
 }
