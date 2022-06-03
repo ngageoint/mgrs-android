@@ -8,7 +8,6 @@ import android.graphics.Region;
 
 import java.util.List;
 
-import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.Label;
@@ -28,30 +27,19 @@ public class TileDraw {
      * @param canvas draw canvas
      */
     public static void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas, Paint paint) {
-        Bounds zoneBounds = zone.getBounds().toMeters();
-        for (Line line : lines) {
-            drawLine(line, tile, zoneBounds, canvas, paint);
-        }
-    }
 
-    /**
-     * Draw the shape on the canvas
-     *
-     * @param line       line to draw
-     * @param tile       tile
-     * @param zoneBounds grid zone bounds
-     * @param canvas     draw canvas
-     * @param paint      line paint
-     */
-    public static void drawLine(Line line, MGRSTile tile, Bounds zoneBounds, Canvas canvas, Paint paint) {
+        PixelRange pixelRange = zone.getBounds().getPixelRange(tile);
+
         canvas.save();
-
-        PixelRange pixelRange = zoneBounds.getPixelRange(tile);
         canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
 
-        Path linePath = new Path();
-        addPolyline(tile, linePath, line);
-        canvas.drawPath(linePath, paint);
+        for (Line line : lines) {
+
+            Path linePath = new Path();
+            addPolyline(tile, linePath, line);
+            canvas.drawPath(linePath, paint);
+
+        }
 
         canvas.restore();
     }
