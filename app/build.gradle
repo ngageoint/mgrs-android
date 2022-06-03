@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def googleMapsApiReleaseKey = hasProperty('RELEASE_MAPS_MAPCACHE_API_KEY') ? RELEASE_MAPS_MAPCACHE_API_KEY: ''
+def googleMapsApiReleaseKey = hasProperty('RELEASE_MAPS_MGRS_API_KEY') ? RELEASE_MAPS_MGRS_API_KEY: ''
 def googleMapsApiKeyDebug = hasProperty('DEBUG_MAPS_API_KEY') ? DEBUG_MAPS_API_KEY: ''
 
 android {
