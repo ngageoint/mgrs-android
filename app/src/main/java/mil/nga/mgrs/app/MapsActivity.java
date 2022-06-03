@@ -24,7 +24,7 @@ import mil.nga.mgrs.tile.MGRSTileProvider;
  * @author wnewman
  * @author osbornb
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     /**
      * Google map
@@ -92,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
         map.setOnCameraIdleListener(this);
         map.setOnMapClickListener(this);
+        map.setOnMapLongClickListener(this);
     }
 
     /**
@@ -114,6 +115,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {
         map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        int mapType = map.getMapType() + 1;
+        if (mapType > GoogleMap.MAP_TYPE_HYBRID) {
+            mapType = GoogleMap.MAP_TYPE_NORMAL;
+        }
+        map.setMapType(mapType);
     }
 
 }
