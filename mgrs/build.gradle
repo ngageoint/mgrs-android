@@ -13,9 +13,6 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 32
-
-        testApplicationId 'mil.nga.mgrs.test'
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     configurations {
@@ -158,6 +155,4 @@ dependencies {
     api 'com.google.android.gms:play-services-maps:18.0.2'
     api 'mil.nga:mgrs:1.0.0'
     javadocDeps 'mil.nga:mgrs:1.0.0'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test:rules:1.4.0'
 }

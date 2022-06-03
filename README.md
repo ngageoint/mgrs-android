@@ -17,11 +17,88 @@ Software source code previously released under an open source license and then m
 
 View the latest [Javadoc](http://ngageoint.github.io/mgrs-android/docs/api/)
 
-#### Example ####
+#### Tile Provider ####
 
 ```java
 
-// TODO
+// Context context = ...;
+// GoogleMap map = ...;
+
+// Tile size determined from display density
+MGRSTileProvider tileProvider = MGRSTileProvider.create(context);
+
+// Manually specify tile size
+MGRSTileProvider tileProvider2 = MGRSTileProvider.create(512, 512);
+
+// GZD only grid
+MGRSTileProvider gzdTileProvider = MGRSTileProvider.createGZD(context);
+
+// Specified grids
+MGRSTileProvider customTileProvider = MGRSTileProvider.create(context,
+        GridType.GZD, GridType.HUNDRED_KILOMETER);
+
+map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
+
+```
+
+#### Tile Provider Options ####
+
+```java
+
+int x = 8;
+int y = 12;
+int zoom = 5;
+
+// Manually get a tile or draw the tile bitmap
+Tile tile = tileProvider.getTile(x, y, zoom);
+Bitmap tileBitmap = tileProvider.drawTile(x, y, zoom);
+
+double latitude = 63.98862388;
+double longitude = 29.06755082;
+LatLng latLng = new LatLng(latitude, longitude);
+
+// MGRS Coordinates
+MGRS mgrs = tileProvider.getMGRS(latLng);
+String coordinate = tileProvider.getCoordinate(latLng);
+String zoomCoordinate = tileProvider.getCoordinate(latLng, zoom);
+
+String mgrsGZD = tileProvider.getCoordinate(latLng, GridType.GZD);
+String mgrs100k = tileProvider.getCoordinate(latLng, GridType.HUNDRED_KILOMETER);
+String mgrs10k = tileProvider.getCoordinate(latLng, GridType.TEN_KILOMETER);
+String mgrs1k = tileProvider.getCoordinate(latLng, GridType.KILOMETER);
+String mgrs100m = tileProvider.getCoordinate(latLng, GridType.HUNDRED_METER);
+String mgrs10m = tileProvider.getCoordinate(latLng, GridType.TEN_METER);
+String mgrs1m = tileProvider.getCoordinate(latLng, GridType.METER);
+
+```
+
+#### Custom Grids ####
+
+```java
+
+Grids grids = Grids.create();
+
+grids.setColor(GridType.GZD, Color.red());
+grids.setWidth(GridType.GZD, 5.0);
+
+grids.setLabelMinZoom(GridType.GZD, 3);
+grids.setLabelMaxZoom(GridType.GZD, 8);
+grids.setLabelTextSize(GridType.GZD, 32.0);
+
+grids.setMinZoom(GridType.HUNDRED_KILOMETER, 4);
+grids.setMaxZoom(GridType.HUNDRED_KILOMETER, 8);
+grids.setColor(GridType.HUNDRED_KILOMETER, Color.blue());
+
+grids.setLabelColor(GridType.HUNDRED_KILOMETER, Color.orange());
+grids.setLabelBuffer(GridType.HUNDRED_KILOMETER, 0.1);
+grids.getLabelPaint(GridType.HUNDRED_KILOMETER).setTypeface(Typeface.DEFAULT_BOLD);
+
+grids.setColor(Color.darkGray(), GridType.TEN_KILOMETER, GridType.KILOMETER,
+        GridType.HUNDRED_METER, GridType.TEN_METER);
+
+grids.disable(GridType.METER);
+
+MGRSTileProvider tileProvider = MGRSTileProvider.create(context, grids);
 
 ```
 

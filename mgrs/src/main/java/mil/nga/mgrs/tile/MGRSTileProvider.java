@@ -423,7 +423,7 @@ public class MGRSTileProvider implements TileProvider {
      * @param zoom zoom level
      * @return bitmap
      */
-    private Bitmap drawTile(int x, int y, int zoom) {
+    public Bitmap drawTile(int x, int y, int zoom) {
         return grids.drawTile(tileWidth, tileHeight, x, y, zoom);
     }
 
