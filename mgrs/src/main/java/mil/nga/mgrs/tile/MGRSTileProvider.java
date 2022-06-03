@@ -40,6 +40,7 @@ public class MGRSTileProvider implements TileProvider {
      * Create a tile provider with all grids
      *
      * @param context app context
+     * @return tile provider
      */
     public static MGRSTileProvider create(Context context) {
         return new MGRSTileProvider(context);
@@ -50,6 +51,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param context app context
      * @param types   grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(Context context, GridType... types) {
         return new MGRSTileProvider(context, types);
@@ -60,6 +62,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param context app context
      * @param types   grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(Context context, Collection<GridType> types) {
         return new MGRSTileProvider(context, types);
@@ -70,6 +73,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param context app context
      * @param grids   grids
+     * @return tile provider
      */
     public static MGRSTileProvider create(Context context, Grids grids) {
         return new MGRSTileProvider(context, grids);
@@ -79,6 +83,7 @@ public class MGRSTileProvider implements TileProvider {
      * Create a tile provider with all grids
      *
      * @param tileLength tile width and height
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileLength) {
         return new MGRSTileProvider(tileLength);
@@ -89,6 +94,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param tileLength tile width and height
      * @param types      grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileLength, GridType... types) {
         return new MGRSTileProvider(tileLength, types);
@@ -99,6 +105,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param tileLength tile width and height
      * @param types      grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileLength, Collection<GridType> types) {
         return new MGRSTileProvider(tileLength, types);
@@ -109,6 +116,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param tileLength tile width and height
      * @param grids      grids
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileLength, Grids grids) {
         return new MGRSTileProvider(tileLength, grids);
@@ -119,6 +127,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param tileWidth  tile width
      * @param tileHeight tile height
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileWidth, int tileHeight) {
         return new MGRSTileProvider(tileWidth, tileHeight);
@@ -130,6 +139,7 @@ public class MGRSTileProvider implements TileProvider {
      * @param tileWidth  tile width
      * @param tileHeight tile height
      * @param types      grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileWidth, int tileHeight, GridType... types) {
         return new MGRSTileProvider(tileWidth, tileHeight, types);
@@ -141,6 +151,7 @@ public class MGRSTileProvider implements TileProvider {
      * @param tileWidth  tile width
      * @param tileHeight tile height
      * @param types      grids types to enable
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileWidth, int tileHeight, Collection<GridType> types) {
         return new MGRSTileProvider(tileWidth, tileHeight, types);
@@ -152,6 +163,7 @@ public class MGRSTileProvider implements TileProvider {
      * @param tileWidth  tile width
      * @param tileHeight tile height
      * @param grids      grids
+     * @return tile provider
      */
     public static MGRSTileProvider create(int tileWidth, int tileHeight, Grids grids) {
         return new MGRSTileProvider(tileWidth, tileHeight, grids);
@@ -161,6 +173,7 @@ public class MGRSTileProvider implements TileProvider {
      * Create a tile provider with Grid Zone Designator grids
      *
      * @param context app context
+     * @return tile provider
      */
     public static MGRSTileProvider createGZD(Context context) {
         return createGZD(TileUtils.tileLength(context));
@@ -170,6 +183,7 @@ public class MGRSTileProvider implements TileProvider {
      * Create a tile provider with Grid Zone Designator grids
      *
      * @param tileLength tile length
+     * @return tile provider
      */
     public static MGRSTileProvider createGZD(int tileLength) {
         return createGZD(tileLength, tileLength);
@@ -180,6 +194,7 @@ public class MGRSTileProvider implements TileProvider {
      *
      * @param tileWidth  tile width
      * @param tileHeight tile height
+     * @return tile provider
      */
     public static MGRSTileProvider createGZD(int tileWidth, int tileHeight) {
         return new MGRSTileProvider(tileWidth, tileHeight, Grids.createGZD());

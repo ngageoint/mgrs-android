@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.Region;
 
 import java.util.List;
 
@@ -25,13 +24,14 @@ public class TileDraw {
      * @param tile   tile
      * @param zone   grid zone
      * @param canvas draw canvas
+     * @param paint  draw paint
      */
     public static void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas, Paint paint) {
 
         PixelRange pixelRange = zone.getBounds().getPixelRange(tile);
 
         canvas.save();
-        canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom(), Region.Op.INTERSECT);
+        canvas.clipRect(pixelRange.getLeft(), pixelRange.getTop(), pixelRange.getRight(), pixelRange.getBottom());
 
         for (Line line : lines) {
 
