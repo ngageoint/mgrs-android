@@ -370,7 +370,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return MGRS coordinate
      */
     public String getCoordinate(LatLng latLng) {
-        return grids.getCoordinate(TileUtils.toPoint(latLng));
+        return getMGRS(latLng).coordinate();
     }
 
     /**
@@ -382,7 +382,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return MGRS coordinate
      */
     public String getCoordinate(LatLng latLng, int zoom) {
-        return grids.getCoordinate(TileUtils.toPoint(latLng), zoom);
+        return getCoordinate(latLng, grids.getPrecision(zoom));
     }
 
     /**
@@ -394,7 +394,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return MGRS coordinate
      */
     public String getCoordinate(LatLng latLng, GridType type) {
-        return grids.getCoordinate(TileUtils.toPoint(latLng), type);
+        return getMGRS(latLng).coordinate(type);
     }
 
     /**
