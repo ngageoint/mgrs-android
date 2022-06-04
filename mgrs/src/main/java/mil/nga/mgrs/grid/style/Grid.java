@@ -65,6 +65,24 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setWidth(double width) {
+        super.setWidth(width);
+        resetLinePaint();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setColor(Color color) {
+        super.setColor(color);
+        resetLinePaint();
+    }
+
+    /**
      * Reset the grid line paint
      */
     public void resetLinePaint() {

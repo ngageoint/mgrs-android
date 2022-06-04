@@ -244,4 +244,22 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
         getGrid(type).setLabelPaint(labelPaint);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setLabelColor(GridType type, Color color) {
+        super.setLabelColor(type, color);
+        getGrid(type).resetLabelPaint();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setLabelTextSize(GridType type, double textSize) {
+        super.setLabelTextSize(type, textSize);
+        getGrid(type).resetLabelPaint();
+    }
+
 }
