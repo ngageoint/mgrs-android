@@ -20,6 +20,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import mil.nga.mgrs.grid.GridType;
+import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
 /**
@@ -93,7 +95,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        tileProvider = MGRSTileProvider.create(this);
+        Grids grids = Grids.create();
+        grids.setLabelMinZoom(GridType.GZD, 3);
+
+        tileProvider = MGRSTileProvider.create(this, grids);
     }
 
     /**
