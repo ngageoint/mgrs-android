@@ -25,17 +25,10 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
     /**
      * Constructor
      *
-     * @param type    grid type
-     * @param enabled enabled grid
-     * @param minZoom minimum zoom level
-     * @param maxZoom maximum zoom level
-     * @param color   grid line color
-     * @param width   grid line width
-     * @param labeler grid labeler
+     * @param type grid type
      */
-    protected Grid(GridType type, boolean enabled, int minZoom, Integer maxZoom,
-                   Color color, double width, Labeler labeler) {
-        super(type, enabled, minZoom, maxZoom, color, width, labeler);
+    protected Grid(GridType type) {
+        super(type);
     }
 
     /**

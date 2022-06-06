@@ -12,7 +12,6 @@ import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Label;
-import mil.nga.mgrs.grid.Labeler;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
@@ -91,9 +90,8 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
      * {@inheritDoc}
      */
     @Override
-    protected Grid newGrid(GridType type, boolean enabled, int minZoom,
-                           Integer maxZoom, Color color, double width, Labeler labeler) {
-        return new Grid(type, enabled, minZoom, maxZoom, color, width, labeler);
+    protected Grid newGrid(GridType type) {
+        return new Grid(type);
     }
 
     /**
