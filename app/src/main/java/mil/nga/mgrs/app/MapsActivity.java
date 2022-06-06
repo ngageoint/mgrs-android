@@ -1,8 +1,12 @@
 package mil.nga.mgrs.app;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,7 +28,7 @@ import mil.nga.mgrs.tile.MGRSTileProvider;
  * @author wnewman
  * @author osbornb
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener {
 
     /**
      * Google map
@@ -45,6 +49,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Zoom label
      */
     private TextView zoomLabel;
+
+    /**
+     * Map type button
+     */
+    private ImageButton mapTypeButton;
 
     /**
      * Coordinate label formatter
@@ -69,7 +78,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -77,6 +85,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wgs84Label = (TextView) findViewById(R.id.wgs84);
         zoomLabel = (TextView) findViewById(R.id.zoom);
         zoomFormatter.setRoundingMode(RoundingMode.DOWN);
+        mapTypeButton = (ImageButton) findViewById(R.id.mapType);
+        mapTypeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onMapTypeClick(v);
+            }
+        });
 
         tileProvider = MGRSTileProvider.create(this);
     }
@@ -92,7 +107,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
         map.setOnCameraIdleListener(this);
         map.setOnMapClickListener(this);
-        map.setOnMapLongClickListener(this);
     }
 
     /**
@@ -104,8 +118,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng center = cameraPosition.target;
         float zoom = cameraPosition.zoom;
         mgrsLabel.setText(tileProvider.getCoordinate(center, (int) zoom));
-        wgs84Label.setText(coordinateFormatter.format(center.longitude)
-                + "," + coordinateFormatter.format(center.latitude));
+        wgs84Label.setText(getString(R.string.wgs84_label,
+                coordinateFormatter.format(center.longitude),
+                coordinateFormatter.format(center.latitude)));
         zoomLabel.setText(zoomFormatter.format(zoom));
     }
 
@@ -118,15 +133,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * {@inheritDoc}
+     * Handle map type click
+     *
+     * @param v view
      */
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        int mapType = map.getMapType() + 1;
-        if (mapType > GoogleMap.MAP_TYPE_HYBRID) {
-            mapType = GoogleMap.MAP_TYPE_NORMAL;
-        }
-        map.setMapType(mapType);
+    private void onMapTypeClick(View v) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.map_type_title));
+
+        // Add an OnClickListener to the dialog, so that the selection will be handled.
+        builder.setSingleChoiceItems(
+                new CharSequence[]{
+                        getString(R.string.map_type_normal),
+                        getString(R.string.map_type_satellite),
+                        getString(R.string.map_type_terrain),
+                        getString(R.string.map_type_hybrid)},
+                map.getMapType() - 1,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        map.setMapType(item + 1);
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+
     }
 
 }

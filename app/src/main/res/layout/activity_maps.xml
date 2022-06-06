@@ -16,7 +16,20 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="mil.nga.giat.mgrs.mil.nga.giat.app.MapsActivity" />
+            tools:context="mil.nga.giat.mgrs.mil.nga.giat.app.MapsActivity">
+
+            <ImageButton
+                android:id="@+id/mapType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|top"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:src="@drawable/baseline_layers_black_36"
+                android:alpha=".5"/>
+
+        </fragment>
 
         <ImageView
             android:layout_width="48dip"

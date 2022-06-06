@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MGRS</string>
+    <string name="wgs84_label">%1$s,%2$s</string>
+    <string name="map_type_title">Map Type</string>
+    <string name="map_type_normal">Normal</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_terrain">Terrain</string>
+    <string name="map_type_hybrid">Hybrid</string>
 </resources>
