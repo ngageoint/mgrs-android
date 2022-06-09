@@ -1,9 +1,12 @@
 package mil.nga.mgrs.app;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -11,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +40,11 @@ import mil.nga.mgrs.tile.MGRSTileProvider;
  * @author osbornb
  */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener {
+
+    /**
+     * Location permission request code
+     */
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     /**
      * Google map
@@ -137,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
         map.setOnCameraIdleListener(this);
         map.setOnMapClickListener(this);
+        enableMyLocation();
     }
 
     /**
@@ -204,8 +215,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(getApplicationContext(), label + " Copied",
+        Toast.makeText(getApplicationContext(), getString(R.string.copied_message, label),
                 Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Enables the My Location layer if fine or coarse location permission has been granted.
+     */
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+        } else {
+            // Location permission has not been granted yet, request it.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            return;
+        }
+        if (isPermissionGranted(permissions, grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION) || isPermissionGranted(permissions, grantResults,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            enableMyLocation();
+        }
+    }
+
+    /**
+     * Is permission granted
+     *
+     * @param permissions  permissions
+     * @param grantResults grant results
+     * @param permission   permission
+     * @return true if granted
+     */
+    private static boolean isPermissionGranted(String[] permissions, int[] grantResults,
+                                               String permission) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (permission.equals(permissions[i])) {
+                return grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            }
+        }
+        return false;
     }
 
 }

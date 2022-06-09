@@ -3,6 +3,7 @@
     <string name="mgrs_label">MGRS Coordinate</string>
     <string name="wgs84_label">WGS84 Coordinate</string>
     <string name="zoom_label">Zoom Level</string>
+    <string name="copied_message">%1$s Copied</string>
     <string name="wgs84_label_format">%1$s,%2$s</string>
     <string name="map_type_title">Map Type</string>
     <string name="map_type_normal">Normal</string>
