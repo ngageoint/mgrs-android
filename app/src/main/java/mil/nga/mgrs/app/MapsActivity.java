@@ -1,10 +1,14 @@
 package mil.nga.mgrs.app;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
@@ -94,6 +98,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 onMapTypeClick(v);
             }
         });
+        mgrsLabel.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                copyToClipboard(getString(R.string.mgrs_label), mgrsLabel.getText());
+                return true;
+            }
+        });
+        wgs84Label.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                copyToClipboard(getString(R.string.wgs84_label), wgs84Label.getText());
+                return true;
+            }
+        });
+        zoomLabel.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                copyToClipboard(getString(R.string.zoom_label), zoomLabel.getText());
+                return true;
+            }
+        });
 
         Grids grids = Grids.create();
         grids.setLabelMinZoom(GridType.GZD, 3);
@@ -123,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng center = cameraPosition.target;
         float zoom = cameraPosition.zoom;
         mgrsLabel.setText(tileProvider.getCoordinate(center, (int) zoom));
-        wgs84Label.setText(getString(R.string.wgs84_label,
+        wgs84Label.setText(getString(R.string.wgs84_label_format,
                 coordinateFormatter.format(center.longitude),
                 coordinateFormatter.format(center.latitude)));
         zoomLabel.setText(zoomFormatter.format(zoom));
@@ -167,6 +192,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dialog.setCanceledOnTouchOutside(true);
         dialog.show();
 
+    }
+
+    /**
+     * Copy text to the clipboard
+     *
+     * @param label label
+     * @param text  text
+     */
+    private void copyToClipboard(String label, CharSequence text) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(label, text);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(getApplicationContext(), label + " Copied",
+                Toast.LENGTH_SHORT).show();
     }
 
 }

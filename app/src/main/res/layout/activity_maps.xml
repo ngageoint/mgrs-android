@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1">
 
         <fragment
@@ -16,20 +16,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="mil.nga.giat.mgrs.mil.nga.giat.app.MapsActivity">
-
-            <ImageButton
-                android:id="@+id/mapType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|top"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:background="#FFFFFFFF"
-                android:src="@drawable/baseline_layers_black_36"
-                android:alpha=".5"/>
-
-        </fragment>
+            tools:context="mil.nga.giat.mgrs.mil.nga.giat.app.MapsActivity" />
 
         <ImageView
             android:layout_width="48dip"
@@ -52,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="MGRS"
+            android:paddingLeft="5dp"
             android:textIsSelectable="true" />
 
         <TextView
@@ -60,16 +47,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Coordinate"
             android:textIsSelectable="true" />
 
         <TextView
             android:id="@+id/zoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="Zoom Level"
+            android:layout_toLeftOf="@+id/mapType"
             android:textIsSelectable="true" />
+
+        <ImageButton
+            android:id="@+id/mapType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
+            android:src="@drawable/baseline_layers_black_20"
+            android:alpha=".5" />
 
     </RelativeLayout>
 

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">MGRS</string>
-    <string name="wgs84_label">%1$s,%2$s</string>
+    <string name="mgrs_label">MGRS Coordinate</string>
+    <string name="wgs84_label">WGS84 Coordinate</string>
+    <string name="zoom_label">Zoom Level</string>
+    <string name="wgs84_label_format">%1$s,%2$s</string>
     <string name="map_type_title">Map Type</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
