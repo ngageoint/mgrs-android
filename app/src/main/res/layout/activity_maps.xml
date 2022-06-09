@@ -25,7 +25,7 @@
                 android:layout_gravity="right|top"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:background="@null"
+                android:background="#FFFFFFFF"
                 android:src="@drawable/baseline_layers_black_36"
                 android:alpha=".5"/>
 
