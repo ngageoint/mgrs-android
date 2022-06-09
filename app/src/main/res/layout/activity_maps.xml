@@ -52,21 +52,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="MGRS"/>
+            android:text="MGRS"
+            android:textIsSelectable="true" />
 
         <TextView
             android:id="@+id/wgs84"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Coordinate" />
+            android:text="Coordinate"
+            android:textIsSelectable="true" />
 
         <TextView
             android:id="@+id/zoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="Zoom Level" />
+            android:text="Zoom Level"
+            android:textIsSelectable="true" />
 
     </RelativeLayout>
 
