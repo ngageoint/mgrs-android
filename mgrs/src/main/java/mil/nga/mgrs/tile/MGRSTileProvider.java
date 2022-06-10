@@ -11,6 +11,7 @@ import java.util.Collection;
 
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
+import mil.nga.mgrs.grid.style.Grid;
 import mil.nga.mgrs.grid.style.Grids;
 
 /**
@@ -378,6 +379,16 @@ public class MGRSTileProvider implements TileProvider {
     }
 
     /**
+     * Get the grid
+     *
+     * @param type grid type
+     * @return grid
+     */
+    public Grid getGrid(GridType type) {
+        return grids.getGrid(type);
+    }
+
+    /**
      * Get the Military Grid Reference System coordinate for the location in one
      * meter precision
      *
@@ -397,7 +408,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return MGRS coordinate
      */
     public String getCoordinate(LatLng latLng, int zoom) {
-        return getCoordinate(latLng, grids.getPrecision(zoom));
+        return getCoordinate(latLng, getPrecision(zoom));
     }
 
     /**
@@ -420,6 +431,16 @@ public class MGRSTileProvider implements TileProvider {
      */
     public MGRS getMGRS(LatLng latLng) {
         return TileUtils.toPoint(latLng).toMGRS();
+    }
+
+    /**
+     * Get the grid precision for the zoom level
+     *
+     * @param zoom zoom level
+     * @return grid type precision
+     */
+    public GridType getPrecision(int zoom) {
+        return grids.getPrecision(zoom);
     }
 
     /**

@@ -54,8 +54,18 @@
             android:id="@+id/zoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/mapType"
+            android:layout_toLeftOf="@+id/search"
             android:textIsSelectable="true" />
+
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/mapType"
+            android:background="@null"
+            android:paddingLeft="10dp"
+            android:src="@drawable/baseline_search_black_20"
+            android:alpha=".5" />
 
         <ImageButton
             android:id="@+id/mapType"

@@ -5,6 +5,11 @@
     <string name="zoom_label">Zoom Level</string>
     <string name="copied_message">%1$s Copied</string>
     <string name="wgs84_label_format">%1$s,%2$s</string>
+    <string name="search_title">Search Coordinate</string>
+    <string name="search">Search</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="search_error">Unsupported Coordinate</string>
     <string name="map_type_title">Map Type</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>

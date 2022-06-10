@@ -173,4 +173,15 @@ public class TileUtils {
         return Point.degrees(latLng.longitude, latLng.latitude);
     }
 
+    /**
+     * Convert a point to a map coordinate
+     *
+     * @param point point
+     * @return latLng
+     */
+    public static LatLng toLatLng(Point point) {
+        point = point.toDegrees();
+        return new LatLng(point.getLatitude(), point.getLongitude());
+    }
+
 }
