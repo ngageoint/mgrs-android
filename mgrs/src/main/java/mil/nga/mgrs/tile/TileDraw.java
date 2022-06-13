@@ -10,6 +10,7 @@ import java.util.List;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.Label;
+import mil.nga.mgrs.grid.style.Grid;
 import mil.nga.mgrs.gzd.GridZone;
 
 /**
@@ -22,11 +23,11 @@ public class TileDraw {
      *
      * @param lines  lines to draw
      * @param tile   tile
+     * @param grid   grid
      * @param zone   grid zone
      * @param canvas draw canvas
-     * @param paint  draw paint
      */
-    public static void drawLines(List<Line> lines, MGRSTile tile, GridZone zone, Canvas canvas, Paint paint) {
+    public static void drawLines(List<Line> lines, MGRSTile tile, Grid grid, GridZone zone, Canvas canvas) {
 
         PixelRange pixelRange = zone.getBounds().getPixelRange(tile);
 
@@ -37,6 +38,7 @@ public class TileDraw {
 
             Path linePath = new Path();
             addPolyline(tile, linePath, line);
+            Paint paint = grid.getLinePaint(line.getGridType());
             canvas.drawPath(linePath, paint);
 
         }

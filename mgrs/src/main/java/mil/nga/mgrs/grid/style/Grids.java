@@ -180,7 +180,6 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
 
         for (Grid grid : zoomGrids.grids()) {
 
-            Paint linePaint = grid.getLinePaint();
             Paint labelPaint = grid.getLabelPaint();
 
             // draw this grid for each zone
@@ -188,7 +187,7 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
 
                 List<Line> lines = grid.getLines(mgrsTile, zone);
                 if (lines != null) {
-                    TileDraw.drawLines(lines, mgrsTile, zone, canvas, linePaint);
+                    TileDraw.drawLines(lines, mgrsTile, grid, zone, canvas);
                 }
 
                 List<Label> labels = grid.getLabels(mgrsTile, zone);
@@ -220,6 +219,28 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
      */
     public void setLinePaint(GridType type, Paint linePaint) {
         getGrid(type).setLinePaint(linePaint);
+    }
+
+    /**
+     * Get the grid type precision line paint for the grid type
+     *
+     * @param type          grid type
+     * @param precisionType precision grid type
+     * @return grid line paint
+     */
+    public Paint getLinePaint(GridType type, GridType precisionType) {
+        return getGrid(type).getLinePaint(precisionType);
+    }
+
+    /**
+     * Set the grid type precision line paint for the grid type
+     *
+     * @param type          grid type
+     * @param precisionType precision grid type
+     * @param linePaint     grid line paint
+     */
+    public void setLinePaint(GridType type, GridType precisionType, Paint linePaint) {
+        getGrid(type).setLinePaint(precisionType, linePaint);
     }
 
     /**

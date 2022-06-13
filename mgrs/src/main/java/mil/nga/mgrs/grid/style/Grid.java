@@ -3,6 +3,9 @@ package mil.nga.mgrs.grid.style;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Labeler;
@@ -13,9 +16,9 @@ import mil.nga.mgrs.grid.Labeler;
 public class Grid extends mil.nga.mgrs.grid.Grid {
 
     /**
-     * Grid line paint
+     * Grid line paint by grid type
      */
-    private Paint linePaint;
+    private Map<GridType, Paint> linePaint = new HashMap<>();
 
     /**
      * Grid label paint
@@ -37,10 +40,25 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
      * @return grid line paint
      */
     public Paint getLinePaint() {
-        if (linePaint == null) {
-            createLinePaint();
+        return getLinePaint(getType());
+    }
+
+    /**
+     * Get the grid line paint for the grid type, create if needed
+     *
+     * @param gridType grid type
+     * @return grid line paint
+     */
+    public Paint getLinePaint(GridType gridType) {
+        if (gridType == null) {
+            gridType = getType();
         }
-        return linePaint;
+        Paint paint = linePaint.get(gridType);
+        if (paint == null) {
+            paint = createLinePaint(gridType);
+            linePaint.put(gridType, paint);
+        }
+        return paint;
     }
 
     /**
@@ -49,12 +67,22 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
      * @return grid line paint
      */
     public Paint createLinePaint() {
-        linePaint = new Paint();
-        linePaint.setAntiAlias(true);
-        linePaint.setStrokeWidth((float) getWidth());
-        linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setColor(getColor().getColorWithAlpha());
-        return linePaint;
+        return createLinePaint(getType());
+    }
+
+    /**
+     * Create the grid line paint
+     *
+     * @param gridType grid type
+     * @return grid line paint
+     */
+    public Paint createLinePaint(GridType gridType) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth((float) getWidth(gridType));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(getColor(gridType).getColorWithAlpha());
+        return paint;
     }
 
     /**
@@ -63,7 +91,7 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
     @Override
     public void setWidth(double width) {
         super.setWidth(width);
-        resetLinePaint();
+        resetLinePaint(getType());
     }
 
     /**
@@ -72,23 +100,60 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
     @Override
     public void setColor(Color color) {
         super.setColor(color);
-        resetLinePaint();
+        resetLinePaint(getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setColor(GridType gridType, Color color) {
+        super.setColor(gridType, color);
+        resetLinePaint(gridType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setWidth(GridType gridType, double width) {
+        super.setWidth(gridType, width);
+        resetLinePaint(gridType);
     }
 
     /**
      * Reset the grid line paint
      */
     public void resetLinePaint() {
-        setLinePaint(null);
+        linePaint.clear();
+    }
+
+    /**
+     * Reset the grid type line paint
+     *
+     * @param gridType grid type
+     */
+    public void resetLinePaint(GridType gridType) {
+        linePaint.remove(gridType);
     }
 
     /**
      * Set the grid line paint
      *
-     * @param linePaint grid line paint
+     * @param paint grid line paint
      */
-    public void setLinePaint(Paint linePaint) {
-        this.linePaint = linePaint;
+    public void setLinePaint(Paint paint) {
+        setLinePaint(getType(), paint);
+    }
+
+    /**
+     * Set the grid line paint
+     *
+     * @param gridType grid type
+     * @param paint    grid line paint
+     */
+    public void setLinePaint(GridType gridType, Paint paint) {
+        linePaint.put(gridType, paint);
     }
 
     /**
