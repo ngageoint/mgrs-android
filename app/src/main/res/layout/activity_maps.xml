@@ -32,14 +32,15 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="45dip">
+        android:layout_height="45dip"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/mgrs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:paddingLeft="5dp"
+            android:paddingLeft="10dp"
             android:textIsSelectable="true" />
 
         <TextView
@@ -63,8 +64,8 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/mapType"
             android:background="@null"
-            android:paddingLeft="10dp"
-            android:src="@drawable/baseline_search_black_20"
+            android:paddingLeft="15dp"
+            android:src="@drawable/baseline_search_black_24"
             android:alpha=".5" />
 
         <ImageButton
@@ -74,8 +75,8 @@
             android:layout_alignParentRight="true"
             android:background="@null"
             android:paddingLeft="10dp"
-            android:paddingRight="5dp"
-            android:src="@drawable/baseline_layers_black_20"
+            android:paddingRight="10dp"
+            android:src="@drawable/baseline_layers_black_24"
             android:alpha=".5" />
 
     </RelativeLayout>
