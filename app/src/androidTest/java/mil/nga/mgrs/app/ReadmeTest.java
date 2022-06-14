@@ -140,6 +140,8 @@ public class ReadmeTest {
 
         grids.disable(GridType.METER);
 
+        grids.enableLabeler(GridType.TEN_KILOMETER);
+
         MGRSTileProvider tileProvider = MGRSTileProvider.create(context, grids);
 
     }

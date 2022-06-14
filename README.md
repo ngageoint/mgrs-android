@@ -98,6 +98,8 @@ grids.setColor(Color.darkGray(), GridType.TEN_KILOMETER, GridType.KILOMETER,
 
 grids.disable(GridType.METER);
 
+grids.enableLabeler(GridType.TEN_KILOMETER);
+
 MGRSTileProvider tileProvider = MGRSTileProvider.create(context, grids);
 
 ```
@@ -150,3 +152,9 @@ From your project directory, link the cloned SDK directory:
 ### Remote Dependencies ###
 
 * [MGRS Java](https://github.com/ngageoint/mgrs-java) (The MIT License (MIT)) - MGRS Library
+
+### MGRS App ###
+
+[APK](https://github.com/ngageoint/geopackage-java/releases/latest/download/mgrs.apk)
+
+The [MGRS App](https://github.com/ngageoint/mgrs-android/tree/develop/app) provides a Military Grid Reference System map using this library.
