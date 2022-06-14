@@ -155,6 +155,6 @@ From your project directory, link the cloned SDK directory:
 
 ### MGRS App ###
 
-[APK](https://github.com/ngageoint/geopackage-java/releases/latest/download/mgrs.apk)
+[APK](https://github.com/ngageoint/mgrs-android/releases/latest/download/mgrs.apk)
 
 The [MGRS App](https://github.com/ngageoint/mgrs-android/tree/master/app) provides a Military Grid Reference System map using this library.
