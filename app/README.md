@@ -1,6 +1,6 @@
 # MGRS App
 
-[APK](https://github.com/ngageoint/geopackage-java/releases/latest/download/mgrs.apk)
+[APK](https://github.com/ngageoint/mgrs-android/releases/latest/download/mgrs.apk)
 
 The MGRS App provides a Military Grid Reference System map using the [mgrs-android](https://github.com/ngageoint/mgrs-android) library.
 
