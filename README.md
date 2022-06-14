@@ -11,7 +11,7 @@ Software source code previously released under an open source license and then m
 
 ### About ###
 
-[MGRS Android](http://ngageoint.github.io/mgrs-android/) is an Android library providing Military Grid Reference System functionality, a geocoordinate standard used by NATO militaries for locating points on Earth.  [MGRS App](https://github.com/ngageoint/mgrs-android/tree/develop/app) is a map implementation utilizing this library.
+[MGRS Android](http://ngageoint.github.io/mgrs-android/) is an Android library providing Military Grid Reference System functionality, a geocoordinate standard used by NATO militaries for locating points on Earth.  [MGRS App](https://github.com/ngageoint/mgrs-android/tree/master/app) is a map implementation utilizing this library.
 
 ### Usage ###
 
@@ -157,4 +157,4 @@ From your project directory, link the cloned SDK directory:
 
 [APK](https://github.com/ngageoint/geopackage-java/releases/latest/download/mgrs.apk)
 
-The [MGRS App](https://github.com/ngageoint/mgrs-android/tree/develop/app) provides a Military Grid Reference System map using this library.
+The [MGRS App](https://github.com/ngageoint/mgrs-android/tree/master/app) provides a Military Grid Reference System map using this library.
