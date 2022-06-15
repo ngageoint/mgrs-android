@@ -153,6 +153,6 @@ afterEvaluate {
 
 dependencies {
     api 'com.google.android.gms:play-services-maps:18.0.2'
-    api 'mil.nga:mgrs:1.0.0'
-    javadocDeps 'mil.nga:mgrs:1.0.0'
+    api 'mil.nga:mgrs:1.0.1'
+    javadocDeps 'mil.nga:mgrs:1.0.1'
 }
