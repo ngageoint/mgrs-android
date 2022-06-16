@@ -282,7 +282,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Search and move to the coordiante
+     * Search and move to the coordinate
      *
      * @param coordinate MGRS, UTM, or WGS84 coordinate
      */
