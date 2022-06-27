@@ -30,7 +30,6 @@ import mil.nga.mgrs.tile.MGRSTileProvider;
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class ReadmeTest {
 
-
     @Before
     public void launchActivity() {
         ActivityScenario.launch(MapsActivity.class);
