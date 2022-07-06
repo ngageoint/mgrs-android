@@ -430,7 +430,7 @@ public class MGRSTileProvider implements TileProvider {
      * @return MGRS
      */
     public MGRS getMGRS(LatLng latLng) {
-        return TileUtils.toPoint(latLng).toMGRS();
+        return MGRS.from(TileUtils.toPoint(latLng));
     }
 
     /**

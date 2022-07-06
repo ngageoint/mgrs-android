@@ -33,8 +33,8 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grid;
 import mil.nga.mgrs.grid.style.Grids;
@@ -308,7 +308,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 String[] parts = coordinate.split("\\s*,\\s*");
                 if (parts.length == 2) {
-                    point = Point.create(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+                    point = Point.point(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
                 }
             }
         } catch (Exception e) {

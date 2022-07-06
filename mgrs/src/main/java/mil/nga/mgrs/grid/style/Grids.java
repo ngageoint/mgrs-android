@@ -7,15 +7,15 @@ import android.graphics.Paint;
 import java.util.Collection;
 import java.util.List;
 
-import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Line;
+import mil.nga.grid.color.Color;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.tile.GridTile;
+import mil.nga.mgrs.features.GridLine;
+import mil.nga.mgrs.grid.GridLabel;
 import mil.nga.mgrs.grid.GridType;
-import mil.nga.mgrs.grid.Label;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
-import mil.nga.mgrs.tile.MGRSTile;
 import mil.nga.mgrs.tile.TileDraw;
 
 /**
@@ -132,7 +132,7 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
         Bitmap bitmap = null;
         ZoomGrids zoomGrids = getGrids(zoom);
         if (zoomGrids.hasGrids()) {
-            bitmap = drawTile(MGRSTile.create(tileWidth, tileHeight, x, y, zoom), zoomGrids);
+            bitmap = drawTile(GridTile.tile(tileWidth, tileHeight, x, y, zoom), zoomGrids);
         }
         return bitmap;
     }
@@ -146,20 +146,20 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
      * @return bitmap tile
      */
     public Bitmap drawTile(int tileWidth, int tileHeight, Bounds bounds) {
-        return drawTile(MGRSTile.create(tileWidth, tileHeight, bounds));
+        return drawTile(GridTile.tile(tileWidth, tileHeight, bounds));
     }
 
     /**
      * Draw the tile
      *
-     * @param mgrsTile tile
+     * @param gridTile tile
      * @return bitmap tile
      */
-    public Bitmap drawTile(MGRSTile mgrsTile) {
+    public Bitmap drawTile(GridTile gridTile) {
         Bitmap bitmap = null;
-        ZoomGrids zoomGrids = getGrids(mgrsTile.getZoom());
+        ZoomGrids zoomGrids = getGrids(gridTile.getZoom());
         if (zoomGrids.hasGrids()) {
-            bitmap = drawTile(mgrsTile, zoomGrids);
+            bitmap = drawTile(gridTile, zoomGrids);
         }
         return bitmap;
     }
@@ -167,16 +167,16 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
     /**
      * Draw the tile
      *
-     * @param mgrsTile  MGRS tile
+     * @param gridTile  tile
      * @param zoomGrids zoom grids
      * @return bitmap tile
      */
-    private Bitmap drawTile(MGRSTile mgrsTile, ZoomGrids zoomGrids) {
+    private Bitmap drawTile(GridTile gridTile, ZoomGrids zoomGrids) {
 
-        Bitmap bitmap = Bitmap.createBitmap(mgrsTile.getWidth(), mgrsTile.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(gridTile.getWidth(), gridTile.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        GridRange gridRange = GridZones.getGridRange(mgrsTile.getBounds());
+        GridRange gridRange = GridZones.getGridRange(gridTile.getBounds());
 
         for (Grid grid : zoomGrids.grids()) {
 
@@ -185,14 +185,14 @@ public class Grids extends mil.nga.mgrs.grid.Grids {
             // draw this grid for each zone
             for (GridZone zone : gridRange) {
 
-                List<Line> lines = grid.getLines(mgrsTile, zone);
+                List<GridLine> lines = grid.getLines(gridTile, zone);
                 if (lines != null) {
-                    TileDraw.drawLines(lines, mgrsTile, grid, zone, canvas);
+                    TileDraw.drawLines(lines, gridTile, grid, zone, canvas);
                 }
 
-                List<Label> labels = grid.getLabels(mgrsTile, zone);
+                List<GridLabel> labels = grid.getLabels(gridTile, zone);
                 if (labels != null) {
-                    TileDraw.drawLabels(labels, grid.getLabelBuffer(), mgrsTile, canvas, labelPaint);
+                    TileDraw.drawLabels(labels, grid.getLabelBuffer(), gridTile, canvas, labelPaint);
                 }
 
             }

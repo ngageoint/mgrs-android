@@ -11,7 +11,7 @@ import com.google.android.gms.maps.model.Tile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import mil.nga.mgrs.features.Point;
+import mil.nga.grid.features.Point;
 
 /**
  * Tile Utils
