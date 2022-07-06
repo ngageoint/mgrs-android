@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import java.util.Collection;
 import java.util.List;
 
-import mil.nga.grid.color.Color;
+import mil.nga.color.Color;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.tile.GridTile;
 import mil.nga.mgrs.features.GridLine;

@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import mil.nga.grid.color.Color;
+import mil.nga.color.Color;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grids;
