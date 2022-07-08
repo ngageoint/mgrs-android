@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 2.0.0 (TBD)
+## [2.0.0](https://github.com/ngageoint/mgrs-android/releases/tag/2.0.0) (07-08-2022)
 
 * mgrs-java version 2.0.0
 

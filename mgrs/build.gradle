@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.mgrs"
 archivesBaseName = "mgrs-android"
-version = "1.0.2"
+version = "2.0.0"
 
 android {
     compileSdkVersion 32
@@ -46,6 +46,9 @@ android {
         classpath += configurations.javadocDeps
         options.source = "11"
         options.links "https://ngageoint.github.io/mgrs-java/docs/api/"
+        options.links "https://ngageoint.github.io/grid-java/docs/api/"
+        options.links "https://ngageoint.github.io/color-java/docs/api/"
+        options.links "https://ngageoint.github.io/simple-features-java/docs/api/"
         options.linksOffline "https://d.android.com/reference","${android.sdkDirectory}/docs/reference"
         destinationDir = file("../javadoc/")
         failOnError false
