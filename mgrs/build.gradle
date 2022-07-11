@@ -50,6 +50,7 @@ android {
         options.links "https://ngageoint.github.io/color-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-java/docs/api/"
         options.linksOffline "https://d.android.com/reference","${android.sdkDirectory}/docs/reference"
+        options.linksOffline "https://developers.google.com/android/reference","${android.sdkDirectory}/extras/google/google_play_services/reference"
         destinationDir = file("../javadoc/")
         failOnError false
     }
