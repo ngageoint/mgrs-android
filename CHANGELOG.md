@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 2.1.1 (TBD)
+
+* TBD
+
 ## [2.1.0](https://github.com/ngageoint/mgrs-android/releases/tag/2.1.0) (07-12-2022)
 
 * compile and target SDK version 33
