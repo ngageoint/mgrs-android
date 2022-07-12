@@ -4,12 +4,12 @@ def googleMapsApiReleaseKey = hasProperty('RELEASE_MAPS_MGRS_API_KEY') ? RELEASE
 def googleMapsApiKeyDebug = hasProperty('DEBUG_MAPS_API_KEY') ? DEBUG_MAPS_API_KEY: ''
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     namespace 'mil.nga.mgrs.app'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
