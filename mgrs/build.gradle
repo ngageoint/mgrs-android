@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.mgrs"
 archivesBaseName = "mgrs-android"
-version = "2.1.1"
+version = "2.2.0"
 
 android {
     compileSdkVersion 33
@@ -156,7 +156,7 @@ afterEvaluate {
 }
 
 dependencies {
-    api 'com.google.android.gms:play-services-maps:18.0.2'
-    api 'mil.nga:mgrs:2.0.0'
-    javadocDeps 'mil.nga:mgrs:2.0.0'
+    api 'com.google.android.gms:play-services-maps:18.1.0'
+    api 'mil.nga:mgrs:2.1.0'
+    javadocDeps 'mil.nga:mgrs:2.1.0'
 }
