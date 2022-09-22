@@ -1,5 +1,7 @@
 package mil.nga.mgrs.grid.style;
 
+import androidx.annotation.NonNull;
+
 import java.util.Iterator;
 
 /**
@@ -23,11 +25,12 @@ public class ZoomGrids extends mil.nga.mgrs.grid.ZoomGrids {
      */
     public Iterable<Grid> grids() {
 
-        return new Iterable<Grid>() {
+        return new Iterable<>() {
 
             /**
              * {@inheritDoc}
              */
+            @NonNull
             @Override
             public Iterator<Grid> iterator() {
                 return gridIterator();
@@ -45,7 +48,7 @@ public class ZoomGrids extends mil.nga.mgrs.grid.ZoomGrids {
 
         Iterator<mil.nga.mgrs.grid.Grid> grids = iterator();
 
-        return new Iterator<Grid>() {
+        return new Iterator<>() {
 
             /**
              * {@inheritDoc}

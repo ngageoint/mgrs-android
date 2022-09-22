@@ -18,7 +18,7 @@ public class Grid extends mil.nga.mgrs.grid.Grid {
     /**
      * Grid line paint by grid type
      */
-    private Map<GridType, Paint> linePaint = new HashMap<>();
+    private final Map<GridType, Paint> linePaint = new HashMap<>();
 
     /**
      * Grid label paint
