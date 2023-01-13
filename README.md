@@ -106,9 +106,9 @@ MGRSTileProvider tileProvider = MGRSTileProvider.create(context, grids);
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.mgrs|mgrs-android|2.2.0|aar) (AAR, POM, Source, Javadoc)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.mgrs|mgrs-android|2.2.1|aar) (AAR, POM, Source, Javadoc)
 
-    api 'mil.nga.mgrs:mgrs-android:2.2.0'
+    api 'mil.nga.mgrs:mgrs-android:2.2.1'
 
 ### Build ###
 
@@ -131,7 +131,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    api 'mil.nga.mgrs:mgrs-android:2.2.0'
+    api 'mil.nga.mgrs:mgrs-android:2.2.1'
 
 As part of the build process, run the "publishToMavenLocal" task on the mgrs-android Gradle script to update the Maven local repository.
 
