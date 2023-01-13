@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.mgrs"
 archivesBaseName = "mgrs-android"
-version = "2.2.1"
+version = "2.2.2"
 
 android {
     compileSdkVersion 33
