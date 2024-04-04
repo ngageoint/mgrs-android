@@ -42,7 +42,8 @@ android {
     task javadoc(type: Javadoc, dependsOn: 'generateReleaseRFile') {
         title = "$archivesBaseName $version API"
         source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        dependsOn("generateDebugRFile")
+        dependsOn("generateReleaseRFile")
         classpath += configurations.javadocDeps
         options.source = "11"
         options.links "https://ngageoint.github.io/mgrs-java/docs/api/"
