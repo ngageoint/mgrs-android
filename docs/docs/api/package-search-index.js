@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"mil.nga.mgrs.grid.style"},{"l":"mil.nga.mgrs.tile"}]
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"mil.nga.mgrs.grid.style"},{"l":"mil.nga.mgrs.tile"}];updateSearchResults();
